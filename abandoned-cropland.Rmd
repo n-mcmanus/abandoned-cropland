@@ -1,0 +1,180 @@
+---
+title: "abandoned_cropland"
+author: "Nick McManus"
+date: '2022-10-06'
+output: html_document
+---
+
+```{r setup, include=TRUE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(sf)  #polygons
+library(raster) #raster package
+library(terra)  #newer/faster/better raster package
+library(rnaturalearth)  #administrative boundaries data
+library(exactextractr)  #zonal stats
+library(kableExtra) #tables
+library(tidyverse) #always
+library(caret) # for confusion matrix
+```
+
+## ROI
+
+This analysis will be focusing on cropland and datasets in Brazil. 
+
+```{r}
+# get brazil from rnaturalearth data
+brazil <- ne_countries(
+  scale = "medium",
+  country = "Brazil",
+  returnclass = "sf") %>% 
+  dplyr::select(sovereignt)
+
+# plot to check
+ggplot() +
+  geom_sf(data = brazil)
+```
+
+## Read in Data
+
+First read in projected 2020 cropland from Chen et al. 2022. Then, crop and mask this global projection to just Brazil. Finally, reclassify the raster to keep only pixels representing cropland.
+
+Source: Chen, G., Li, X., & Liu, X. (2022). Global land projection based on plant functional types with a 1-km resolution under socio-climatic scenarios. Scientific Data, 9(1), 125. https://doi.org/10.1038/s41597-022-01208-6
+
+```{r}
+# read in "baseline" 2015 GeoTiff
+PFT_2015_global <- rast("data/global_PFT_2015.tif")
+
+
+# read in SSP1 scenarios for 2020 - 2050
+ssp1_2020_global <- rast("data/SSP1_RCP26/global_PFT_SSP1_RCP26_2020.tif")   #2020
+ssp1_2030_global <- rast("data/SSP1_RCP26/global_PFT_SSP1_RCP26_2030.tif")   #2030
+ssp1_2040_global <- rast("data/SSP1_RCP26/global_PFT_SSP1_RCP26_2040.tif")   #2040
+ssp1_2050_global <- rast("data/SSP1_RCP26/global_PFT_SSP1_RCP26_2050.tif")   #2050
+
+# read in SSP2 scenarios for 2020 - 2050
+ssp2_2020_global <- rast("data/SSP2_RCP45/global_PFT_SSP2_RCP45_2020.tif")   #2020
+ssp2_2030_global <- rast("data/SSP2_RCP45/global_PFT_SSP2_RCP45_2030.tif")   #2030
+ssp2_2040_global <- rast("data/SSP2_RCP45/global_PFT_SSP2_RCP45_2040.tif")   #2040
+ssp2_2050_global <- rast("data/SSP2_RCP45/global_PFT_SSP2_RCP45_2050.tif")   #2050
+
+# read in SSP3 scenarios for 2020 - 2050
+ssp3_2020_global <- rast("data/SSP3_RCP70/global_PFT_SSP3_RCP70_2020.tif")   #2020
+ssp3_2030_global <- rast("data/SSP3_RCP70/global_PFT_SSP3_RCP70_2030.tif")   #2030
+ssp3_2040_global <- rast("data/SSP3_RCP70/global_PFT_SSP3_RCP70_2040.tif")   #2040
+ssp3_2050_global <- rast("data/SSP3_RCP70/global_PFT_SSP3_RCP70_2050.tif")   #2050
+
+# read in SSP4 scenarios for 2020 - 2050
+ssp4_2020_global <- rast("data/SSP4_RCP60/global_PFT_SSP4_RCP60_2020.tif")   #2020
+ssp4_2020_global <- rast("data/SSP4_RCP60/global_PFT_SSP4_RCP60_2030.tif")   #2030
+ssp4_2020_global <- rast("data/SSP4_RCP60/global_PFT_SSP4_RCP60_2040.tif")   #2040
+ssp4_2020_global <- rast("data/SSP4_RCP60/global_PFT_SSP4_RCP60_2050.tif")   #2050
+
+# read in SSP5 scenarios for 2020 - 2050
+ssp5_2020_global <- rast("data/SSP5_RCP85/global_PFT_SSP5_RCP85_2020.tif")   #2020
+ssp5_2030_global <- rast("data/SSP5_RCP85/global_PFT_SSP5_RCP85_2030.tif")   #2030
+ssp5_2040_global <- rast("data/SSP5_RCP85/global_PFT_SSP5_RCP85_2040.tif")   #2040
+ssp5_2050_global <- rast("data/SSP5_RCP85/global_PFT_SSP5_RCP85_2050.tif")   #2050
+```
+
+
+```{r}
+# transform brazil to chen raster bc it's faster than re-projecting the whole global raster
+brazil_trans <- brazil %>% 
+  st_transform(crs = crs(PFT_2015_global)) %>% 
+  vect() # vect is more agreeable to rasts
+```
+
+
+```{r}
+# crop and mask chen data to brazil_trans vector, then project back to our desired crs
+
+# crop baseline 2015 data
+PFT_2015_brazil <- PFT_2015_global %>% 
+  crop(brazil_trans) %>% 
+  mask(brazil_trans) %>% 
+  terra::project(y = crs(brazil))
+
+# crop and mask all SSP1 layers
+ssp1_2020_brazil <- ssp1_2020_global %>% 
+  crop(brazil_trans) %>% 
+  mask(brazil_trans) %>% 
+  terra::project(y = crs(brazil))
+
+ssp1_2030_brazil <- ssp1_2030_global %>% 
+  crop(brazil_trans) %>% 
+  mask(brazil_trans) %>% 
+  terra::project(y = crs(brazil))
+
+ssp1_2040_brazil <- ssp1_2040_global %>% 
+  crop(brazil_trans) %>% 
+  mask(brazil_trans) %>% 
+  terra::project(y = crs(brazil))
+
+ssp1_2050_brazil <- ssp1_2050_global %>% 
+  crop(brazil_trans) %>% 
+  mask(brazil_trans) %>% 
+  terra::project(y = crs(brazil))
+
+
+# crop and mask all SSP2 layers
+ssp2_2020_brazil <- ssp2_2020_global %>% 
+  crop(brazil_trans) %>% 
+  mask(brazil_trans) %>% 
+  terra::project(y = crs(brazil))
+
+ssp2_2030_brazil <- ssp2_2030_global %>% 
+  crop(brazil_trans) %>% 
+  mask(brazil_trans) %>% 
+  terra::project(y = crs(brazil))
+
+ssp2_2040_brazil <- ssp2_2040_global %>% 
+  crop(brazil_trans) %>% 
+  mask(brazil_trans) %>% 
+  terra::project(y = crs(brazil))
+
+ssp2_2050_brazil <- ssp2_2050_global %>% 
+  crop(brazil_trans) %>% 
+  mask(brazil_trans) %>% 
+  terra::project(y = crs(brazil))
+
+
+# crop and mask all SSP3 layers
+ssp3_2020_brazil <- ssp3_2020_global %>% 
+  crop(brazil_trans) %>% 
+  mask(brazil_trans) %>% 
+  terra::project(y = crs(brazil))
+
+
+
+```
+
+
+```{r}
+# reclassify to isolate just cropland from the raster
+
+# baseline 2015 data
+cropland_2015_brazil <- PFT_2015_brazil 
+  cropland_2015_brazil[cropland_2015_brazil != 18] <- 0 # if value isn't 18, make 0
+  cropland_2015_brazil[cropland_2015_brazil == 18] <- 1 # if value is 18, make 1
+  
+  
+# reclassify SSP1 layers for 2020 - 2050
+cropland_ssp1_2020 <- ssp1_2020_brazil
+  cropland_ssp1_2020[cropland_ssp1_2020 != 18] <- 0
+  cropland_ssp1_2020[cropland_ssp1_2020 == 18] <- 1
+
+```
+
+
+```{r}
+# find abandoned pixels
+
+# cropland abandonment for SSP1 for 2020 - 2050
+abandoned_SSP1_2020 <- cropland_ssp1_2020 - cropland_2015_brazil
+
+plot(abandoned_SSP1_2020)
+```
+
+
+
+
