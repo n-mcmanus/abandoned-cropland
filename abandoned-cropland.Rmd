@@ -52,9 +52,9 @@ ssp3_2050_global <- rast("data/SSP3_RCP70/global_PFT_SSP3_RCP70_2050.tif")   #20
 
 # read in projected SSP4 LULC for 2020 - 2050
 ssp4_2020_global <- rast("data/SSP4_RCP60/global_PFT_SSP4_RCP60_2020.tif")   #2020
-ssp4_2020_global <- rast("data/SSP4_RCP60/global_PFT_SSP4_RCP60_2030.tif")   #2030
-ssp4_2020_global <- rast("data/SSP4_RCP60/global_PFT_SSP4_RCP60_2040.tif")   #2040
-ssp4_2020_global <- rast("data/SSP4_RCP60/global_PFT_SSP4_RCP60_2050.tif")   #2050
+ssp4_2030_global <- rast("data/SSP4_RCP60/global_PFT_SSP4_RCP60_2030.tif")   #2030
+ssp4_2040_global <- rast("data/SSP4_RCP60/global_PFT_SSP4_RCP60_2040.tif")   #2040
+ssp4_2050_global <- rast("data/SSP4_RCP60/global_PFT_SSP4_RCP60_2050.tif")   #2050
 
 # read in projected SSP5 LULC for 2020 - 2050
 ssp5_2020_global <- rast("data/SSP5_RCP85/global_PFT_SSP5_RCP85_2020.tif")   #2020
@@ -211,7 +211,7 @@ ssp5_2050_brazil <- ssp5_2050_global %>%
 
 ## Reclassify
 
-Reclassify each LULC layer to isolate cropland (value 18) from the raster. 
+First, reclassify each LULC layer to isolate pixels of cropland (value 18) from the raster. 
 
 ```{r}
 # baseline 2015 data
@@ -312,19 +312,241 @@ crops_ssp5_2050 <- ssp5_2050_brazil
 ```
 
 
-## Calculate abandonment
-
-Now that we've isolated Brazilian cropland, we want to determine where current cropland is projected to become "abandoned" in the future. This will done with a simple raster calculation, subtracting the future cropland raster from the current cropland raster. Values returning X will 
-
+Next, reclassify layers each projected LULC layer to isolate urban pixels (value 19).
 ```{r}
-# find abandoned pixels
 
-# cropland abandonment for SSP1 for 2020 - 2050
-abandoned_SSP1_2020 <- crops_ssp1_2020 - crops_2015_brazil
+# SSP1 layers for 2020 - 2050 -------------------
+urban_ssp1_2020 <- ssp1_2020_brazil
+  urban_ssp1_2020[urban_ssp1_2020 != 19] <- 0  # if value isn't 19, make 0
+  urban_ssp1_2020[urban_ssp1_2020 == 19] <- 10  # if value is 19, make 10
 
-plot(abandoned_SSP1_2020)
+urban_ssp1_2030 <- ssp1_2030_brazil
+  urban_ssp1_2030[urban_ssp1_2030 != 19] <- 0
+  urban_ssp1_2030[urban_ssp1_2030 == 19] <- 10
+  
+urban_ssp1_2040 <- ssp1_2040_brazil
+  urban_ssp1_2040[urban_ssp1_2040 != 19] <- 0
+  urban_ssp1_2040[urban_ssp1_2040 == 19] <- 10
+  
+urban_ssp1_2050 <- ssp1_2050_brazil
+  urban_ssp1_2050[urban_ssp1_2050 != 19] <- 0
+  urban_ssp1_2050[urban_ssp1_2050 == 19] <- 10
+  
+
+# SSP2 layers for 2020 - 2050 -------------------
+urban_ssp2_2020 <- ssp2_2020_brazil
+  urban_ssp2_2020[urban_ssp2_2020 != 19] <- 0  
+  urban_ssp2_2020[urban_ssp2_2020 == 19] <- 10
+
+urban_ssp2_2030 <- ssp2_2030_brazil   
+  urban_ssp2_2030[urban_ssp2_2030 != 19] <- 0
+  urban_ssp2_2030[urban_ssp2_2030 == 19] <- 10
+  
+urban_ssp2_2040 <- ssp2_2040_brazil
+  urban_ssp2_2040[urban_ssp2_2040 != 19] <- 0
+  urban_ssp2_2040[urban_ssp2_2040 == 19] <- 10
+  
+urban_ssp2_2050 <- ssp2_2050_brazil
+  urban_ssp2_2050[urban_ssp2_2050 != 19] <- 0
+  urban_ssp2_2050[urban_ssp2_2050 == 19] <- 10
+
+  
+# SSP3 layers for 2020 - 2050 -------------------
+urban_ssp3_2020 <- ssp3_2020_brazil
+  urban_ssp3_2020[urban_ssp3_2020 != 19] <- 0  
+  urban_ssp3_2020[urban_ssp3_2020 == 19] <- 10
+
+urban_ssp3_2030 <- ssp3_2030_brazil   
+  urban_ssp3_2030[urban_ssp3_2030 != 19] <- 0
+  urban_ssp3_2030[urban_ssp3_2030 == 19] <- 10
+  
+urban_ssp3_2040 <- ssp3_2040_brazil
+  urban_ssp3_2040[urban_ssp3_2040 != 19] <- 0
+  urban_ssp3_2040[urban_ssp3_2040 == 19] <- 10
+  
+urban_ssp3_2050 <- ssp3_2050_brazil
+  urban_ssp3_2050[urban_ssp3_2050 != 19] <- 0
+  urban_ssp3_2050[urban_ssp3_2050 == 19] <- 10
+  
+
+# SSP4 layers for 2020 - 2050 -------------------
+urban_ssp4_2020 <- ssp4_2020_brazil
+  urban_ssp4_2020[urban_ssp4_2020 != 19] <- 0  
+  urban_ssp4_2020[urban_ssp4_2020 == 19] <- 10
+
+urban_ssp4_2030 <- ssp4_2030_brazil   
+  urban_ssp4_2030[urban_ssp4_2030 != 19] <- 0
+  urban_ssp4_2030[urban_ssp4_2030 == 19] <- 10
+  
+urban_ssp4_2040 <- ssp4_2040_brazil
+  urban_ssp4_2040[urban_ssp4_2040 != 19] <- 0
+  urban_ssp4_2040[urban_ssp4_2040 == 19] <- 10
+  
+urban_ssp4_2050 <- ssp4_2050_brazil
+  urban_ssp4_2050[urban_ssp4_2050 != 19] <- 0
+  urban_ssp4_2050[urban_ssp4_2050 == 19] <- 10
+  
+  
+# SSP5 layers for 2020 - 2050 -------------------
+urban_ssp5_2020 <- ssp5_2020_brazil
+  urban_ssp5_2020[urban_ssp5_2020 != 19] <- 0  
+  urban_ssp5_2020[urban_ssp5_2020 == 19] <- 10
+
+urban_ssp5_2030 <- ssp5_2030_brazil   
+  urban_ssp5_2030[urban_ssp5_2030 != 19] <- 0
+  urban_ssp5_2030[urban_ssp5_2030 == 19] <- 10
+  
+urban_ssp5_2040 <- ssp5_2040_brazil
+  urban_ssp5_2040[urban_ssp5_2040 != 19] <- 0
+  urban_ssp5_2040[urban_ssp5_2040 == 19] <- 10
+  
+urban_ssp5_2050 <- ssp5_2050_brazil
+  urban_ssp5_2050[urban_ssp5_2050 != 19] <- 0
+  urban_ssp5_2050[urban_ssp5_2050 == 19] <- 10
 ```
 
 
+## Calculate abandonment
 
+Now that we've isolated Brazilian cropland, we want to determine where current cropland is projected to become "abandoned" in the future. This will done with a simple raster calculation, subtracting the future cropland raster from the current cropland raster. Values of 0 indicate land that either remained cropland (1-1) or remained non-cropland (0-0). Values of -1 indicate new future cropland (0-1), while values of 1 indicate abandoned cropland (1-0). 
+
+This calculation will be repeated for each projected raster (2020-2050) against the baseline raster (2015). 
+
+```{r}
+# SSP1 abandonment 2020-2050 ----------------------------
+ab_ssp1_2020 <- crops_2015_brazil - crops_ssp1_2020
+ab_ssp1_2030 <- crops_2015_brazil - crops_ssp1_2030
+ab_ssp1_2040 <- crops_2015_brazil - crops_ssp1_2040
+ab_ssp1_2050 <- crops_2015_brazil - crops_ssp1_2050
+
+
+# SSP2 abandonment 2020-2050 ----------------------------
+ab_ssp2_2020 <- crops_2015_brazil - crops_ssp2_2020
+ab_ssp2_2030 <- crops_2015_brazil - crops_ssp2_2030
+ab_ssp2_2040 <- crops_2015_brazil - crops_ssp2_2040
+ab_ssp2_2050 <- crops_2015_brazil - crops_ssp2_2050
+
+
+# SSP3 abandonment 2020-2050 ----------------------------
+ab_ssp3_2020 <- crops_2015_brazil - crops_ssp3_2020
+ab_ssp3_2030 <- crops_2015_brazil - crops_ssp3_2030
+ab_ssp3_2040 <- crops_2015_brazil - crops_ssp3_2040
+ab_ssp3_2050 <- crops_2015_brazil - crops_ssp3_2050
+
+
+# SSP4 abandonment 2020-2050 ----------------------------
+ab_ssp4_2020 <- crops_2015_brazil - crops_ssp4_2020
+ab_ssp4_2030 <- crops_2015_brazil - crops_ssp4_2030
+ab_ssp4_2040 <- crops_2015_brazil - crops_ssp4_2040
+ab_ssp4_2050 <- crops_2015_brazil - crops_ssp4_2050
+
+
+# SSP5 abandonment 2020-2050 ----------------------------
+ab_ssp5_2020 <- crops_2015_brazil - crops_ssp5_2020
+ab_ssp5_2030 <- crops_2015_brazil - crops_ssp5_2030
+ab_ssp5_2040 <- crops_2015_brazil - crops_ssp5_2040
+ab_ssp5_2050 <- crops_2015_brazil - crops_ssp5_2050
+
+```
+
+
+Now, remove any pixels that change from cropland to urban in the future. Urbanization of cropland disqualifies it from potential restoration and is not useful for this project's analysis. This is done by subtracting projected urban areas (classified as value of 10) from the abandonment layers (classified value of 1). 
+Values of 1 indicate cropland abandonment without transition to urban (1-0). Values of -9 indicate areas of abandonment that did transition to urban (1-10). 
+```{r}
+# SSP1 non-urbanized abandonment 2020-2050 --------------------
+ab_ssp1_2020u <- ab_ssp1_2020 - urban_ssp1_2020
+ab_ssp1_2030u <- ab_ssp1_2030 - urban_ssp1_2030
+ab_ssp1_2040u <- ab_ssp1_2040 - urban_ssp1_2040
+ab_ssp1_2050u <- ab_ssp1_2050 - urban_ssp1_2050
+
+# SSP2 non-urbanized abandonment 2020-2050 --------------------
+ab_ssp2_2020u <- ab_ssp2_2020 - urban_ssp2_2020
+ab_ssp2_2030u <- ab_ssp2_2030 - urban_ssp2_2030
+ab_ssp2_2040u <- ab_ssp2_2040 - urban_ssp2_2040
+ab_ssp2_2050u <- ab_ssp2_2050 - urban_ssp2_2050
+
+# SSP3 non-urbanized abandonment 2020-2050 --------------------
+ab_ssp3_2020u <- ab_ssp3_2020 - urban_ssp3_2020
+ab_ssp3_2030u <- ab_ssp3_2030 - urban_ssp3_2030
+ab_ssp3_2040u <- ab_ssp3_2040 - urban_ssp3_2040
+ab_ssp3_2050u <- ab_ssp3_2050 - urban_ssp3_2050
+
+# SSP4 non-urbanized abandonment 2020-2050 --------------------
+ab_ssp4_2020u <- ab_ssp4_2020 - urban_ssp4_2020
+ab_ssp4_2030u <- ab_ssp4_2030 - urban_ssp4_2030
+ab_ssp4_2040u <- ab_ssp4_2040 - urban_ssp4_2040
+ab_ssp4_2050u <- ab_ssp4_2050 - urban_ssp4_2050
+
+# SSP5 non-urbanized abandonment 2020-2050 --------------------
+ab_ssp5_2020u <- ab_ssp5_2020 - urban_ssp5_2020
+ab_ssp5_2030u <- ab_ssp5_2030 - urban_ssp5_2030
+ab_ssp5_2040u <- ab_ssp5_2040 - urban_ssp5_2040
+ab_ssp5_2050u <- ab_ssp5_2050 - urban_ssp5_2050
+```
+These layers may be useful for future study into the rates of LULC transition over time between cropland and urban classification. For this analysis, we want to isolate just pixels of non-urbanized cropland abandonment. In this next step, we'll reclassify the abandonment layers to only return pixels of non-urbanized abandonment (for ease of next analysis steps)
+
+```{r}
+# reclassify SSP1 non-urbanized cropland abandonment 2020-2050 
+ab_ssp1_2020u[ab_ssp1_2020u != 1] <- 0
+ab_ssp1_2030u[ab_ssp1_2030u != 1] <- 0
+ab_ssp1_2040u[ab_ssp1_2040u != 1] <- 0
+ab_ssp1_2050u[ab_ssp1_2050u != 1] <- 0
+
+# reclassify SSP2 non-urbanized cropland abandonment 2020-2050 
+ab_ssp2_2020u[ab_ssp2_2020u != 1] <- 0
+ab_ssp2_2030u[ab_ssp2_2030u != 1] <- 0
+ab_ssp2_2040u[ab_ssp2_2040u != 1] <- 0
+ab_ssp2_2050u[ab_ssp2_2050u != 1] <- 0
+
+# reclassify SSP3 non-urbanized cropland abandonment 2020-2050 
+ab_ssp3_2020u[ab_ssp3_2020u != 1] <- 0
+ab_ssp3_2030u[ab_ssp3_2030u != 1] <- 0
+ab_ssp3_2040u[ab_ssp3_2040u != 1] <- 0
+ab_ssp3_2050u[ab_ssp3_2050u != 1] <- 0
+
+# reclassify SSP4 non-urbanized cropland abandonment 2020-2050 
+ab_ssp4_2020u[ab_ssp4_2020u != 1] <- 0
+ab_ssp4_2030u[ab_ssp4_2030u != 1] <- 0
+ab_ssp4_2040u[ab_ssp4_2040u != 1] <- 0
+ab_ssp4_2050u[ab_ssp4_2050u != 1] <- 0
+
+# reclassify SSP5 non-urbanized cropland abandonment 2020-2050 
+ab_ssp5_2020u[ab_ssp5_2020u != 1] <- 0
+ab_ssp5_2030u[ab_ssp5_2030u != 1] <- 0
+ab_ssp5_2040u[ab_ssp5_2040u != 1] <- 0
+ab_ssp5_2050u[ab_ssp5_2050u != 1] <- 0
+```
+
+Then, values for an SSP will be summed to return one spatial raster indicating every pixel of cropland was projected to be abandoned *at some point* between 2020-2050.
+
+```{r}
+# matrix for reclassification
+m <- c(0, 0,
+       1, 1, 
+       2, 1, 
+       3, 1,
+       4, 1)
+
+mat <- matrix(m, ncol=2, byrow=TRUE)
+
+# add SSP1 layers and reclassify
+abandoned_ssp1 <- ab_ssp1_2020u + ab_ssp1_2030u + ab_ssp1_2040u + ab_ssp1_2050u
+abandoned_ssp1 <- classify(abandoned_ssp1, mat)
+
+# add SSP2 layers and reclassify
+abandoned_ssp2 <- ab_ssp2_2020u + ab_ssp2_2030u + ab_ssp2_2040u + ab_ssp2_2050u
+abandoned_ssp2 <- classify(abandoned_ssp2, mat)
+
+# add SSP3 layers and reclassify
+abandoned_ssp3 <- ab_ssp3_2020u + ab_ssp3_2030u + ab_ssp3_2040u + ab_ssp3_2050u
+abandoned_ssp3 <- classify(abandoned_ssp3, mat)
+
+# add SSP4 layers and reclassify
+abandoned_ssp4 <- ab_ssp4_2020u + ab_ssp4_2030u + ab_ssp4_2040u + ab_ssp4_2050u
+abandoned_ssp4 <- classify(abandoned_ssp4, mat)
+
+# add SSP1 layers and reclassify
+abandoned_ssp5 <- ab_ssp5_2020u + ab_ssp5_2030u + ab_ssp5_2040u + ab_ssp5_2050u
+abandoned_ssp5 <- classify(abandoned_ssp5, mat)
+```
 
