@@ -487,7 +487,7 @@ These layers may be useful for future study into the rates of LULC transition ov
 
 ```{r}
 # reclassify SSP1 non-urbanized cropland abandonment 2020-2050 
-ab_ssp1_2020u[ab_ssp1_2020u != 1] <- 0
+ab_ssp1_2020u[ab_ssp1_2020u != 1] <- 0  # only keeping values of 1
 ab_ssp1_2030u[ab_ssp1_2030u != 1] <- 0
 ab_ssp1_2040u[ab_ssp1_2040u != 1] <- 0
 ab_ssp1_2050u[ab_ssp1_2050u != 1] <- 0
@@ -545,8 +545,20 @@ abandoned_ssp3 <- classify(abandoned_ssp3, mat)
 abandoned_ssp4 <- ab_ssp4_2020u + ab_ssp4_2030u + ab_ssp4_2040u + ab_ssp4_2050u
 abandoned_ssp4 <- classify(abandoned_ssp4, mat)
 
-# add SSP1 layers and reclassify
+# add SSP5 layers and reclassify
 abandoned_ssp5 <- ab_ssp5_2020u + ab_ssp5_2030u + ab_ssp5_2040u + ab_ssp5_2050u
 abandoned_ssp5 <- classify(abandoned_ssp5, mat)
+```
+
+
+## Export layers
+
+Now we want to save these layers for future use in other scripts
+```{r}
+writeRaster(abandoned_ssp1, "data/SSP1_abandoned_cropland.tif")
+writeRaster(abandoned_ssp2, "data/SSP2_abandoned_cropland.tif")
+writeRaster(abandoned_ssp3, "data/SSP3_abandoned_cropland.tif")
+writeRaster(abandoned_ssp4, "data/SSP4_abandoned_cropland.tif")
+writeRaster(abandoned_ssp5, "data/SSP5_abandoned_cropland.tif")
 ```
 
