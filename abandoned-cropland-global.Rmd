@@ -14,6 +14,115 @@ library(rnaturalearth)  #administrative boundaries data
 library(tidyverse) #always
 ```
 
-## R Markdown
+## Overview
+This analysis serves to find areas of projected cropland abandonment in 2050. Land use and land cover (LULC) data from Chen et al. 2022. This source includes both projected LULC under different shared socioeconomic pathways (SSPs) as well as a baseline LULC data from 2015. The outputs from this code, rasters containing pixels of projected global cropland abandonment in 2050 for a given SSP, will be utilized for further analysis into conservation optimization. More information on the source data can be found in the project README.md file. 
+
+Source: Chen, G., Li, X., & Liu, X. (2022). Global land projection based on plant functional types with a 1-km resolution under socio-climatic scenarios. Scientific Data, 9(1), 125. https://doi.org/10.1038/s41597-022-01208-6
 
 
+## Read in data
+
+First read in projected 2050 LULC from Chen et al. for each SSP.
+
+```{r}
+# read in "baseline" 2015 LULC
+PFT_2015 <- rast("data/src/global_PFT_2015.tif")
+
+# SSP1
+ssp1_PFT_2050 <- rast("data/src/SSP1_RCP26/global_PFT_SSP1_RCP26_2050.tif")
+# SSP2
+ssp2_PFT_2050 <- rast("data/src/SSP2_RCP45/global_PFT_SSP2_RCP45_2050.tif")
+# SSP3  
+ssp3_PFT_2050 <- rast("data/src/SSP3_RCP70/global_PFT_SSP3_RCP70_2050.tif")  
+# SSP4
+ssp4_PFT_2050 <- rast("data/src/SSP4_RCP60/global_PFT_SSP4_RCP60_2050.tif") 
+# SSP5
+ssp5_PFT_2050 <- rast("data/src/SSP5_RCP85/global_PFT_SSP5_RCP85_2050.tif")
+```
+
+
+## Reclassify
+
+We are only interested in keeping values for pixels that reflect cropland and urban. Each layer will be reclassified to make all other variables 0.
+
+```{r}
+# create matrix for reclassification
+reclass_df <- c(1, 0,	  #Water
+                2, 0,	  #Broadleaf evergreen tree, tropical
+                3, 0,	  #Broadleaf evergreen tree, temperate
+                4, 0,	  #Broadleaf deciduous tree, tropical
+                5, 0,	  #Broadleaf deciduous tree, temperate
+                6, 0,	  #Broadleaf deciduous tree, boreal
+                7, 0,	  #Needleleaf evergreen tree, temperate
+                8, 0,	  #Needleleaf evergreen tree, boreal
+                9, 0,	  #Needleleaf deciduous tree
+                10, 0,	#Broadleaf evergreen shrub, temperate
+                11, 0,	#Broadleaf deciduous shrub, temperate
+                12, 0,	#Broadleaf deciduous shrub, boreal
+                13, 0,	#C3 grass, arctic
+                14, 0,	#C3 grass
+                15, 0,	#C4 grass
+                16, 0,	#Mixed C3/C4 grass
+                17, 0,	#Barren
+                18, 1,	#Cropland
+                19, 10,	#Urban
+                20, 0,  #Permanent snow and ice
+                128, 0)	#N/A values
+
+reclass_m <- matrix(reclass_df, ncol=2, byrow=TRUE)
+
+# reclassify 2015 layer
+crop_urban_2015 <- classify(PFT_2015, reclass_m)
+
+# reclassify the rest of the projected layers
+ssp1_2050_crop_urban <- classify(ssp1_PFT_2050, reclass_m)
+ssp2_2050_crop_urban <- classify(ssp2_PFT_2050, reclass_m)
+ssp3_2050_crop_urban <- classify(ssp3_PFT_2050, reclass_m)
+ssp4_2050_crop_urban <- classify(ssp4_PFT_2050, reclass_m)
+ssp5_2050_crop_urban <- classify(ssp5_PFT_2050, reclass_m)
+```
+
+## Calculate abandonment
+
+Now that we've isolated layers of interest cropland, we want to determine where current cropland is projected to become "abandoned" in the future. This will be done with a simple raster calculation, subtracting the future cropland raster from the current cropland raster. Values of 0 indicate land that either remained cropland (1-1), remained urban (10-10), or remained non-cropland (0-0). Values of -1 indicate new future cropland (0-1) and values of -10 indicate areas of new urban (0-10). Values of 1 indicate abandoned cropland (1-0) that did not become urban, which are our pixels of interest! 
+
+```{r}
+# raster calculation between 2015 and 2050 LULC for each SSP
+diff_ssp1_2050 <- crop_urban_2015 - ssp1_2050_crop_urban 
+diff_ssp2_2050 <- crop_urban_2015 - ssp2_2050_crop_urban 
+diff_ssp3_2050 <- crop_urban_2015 - ssp3_2050_crop_urban 
+diff_ssp4_2050 <- crop_urban_2015 - ssp4_2050_crop_urban 
+diff_ssp5_2050 <- crop_urban_2015 - ssp5_2050_crop_urban 
+```
+
+Now, we want to only keep values of 1 (non-urbanized cropland abandonment).
+```{r}
+# all values that aren't 1 become 0
+abandoned_ssp1_2050 <- diff_ssp1_2050
+  abandoned_ssp1_2050[abandoned_ssp1_2050 != 1] <- 0
+  
+abandoned_ssp2_2050 <- diff_ssp2_2050
+  abandoned_ssp2_2050[abandoned_ssp2_2050 != 1] <- 0
+  
+abandoned_ssp3_2050 <- diff_ssp3_2050
+  abandoned_ssp3_2050[abandoned_ssp3_2050 != 1] <- 0
+  
+abandoned_ssp4_2050 <- diff_ssp4_2050
+  abandoned_ssp4_2050[abandoned_ssp4_2050 != 1] <- 0
+  
+abandoned_ssp5_2050 <- diff_ssp5_2050
+  abandoned_ssp5_2050[abandoned_ssp5_2050 != 1] <- 0
+```
+
+
+## Export layers
+
+Finally, we can save these layers for future use in other scripts.
+```{r}
+# saves raster to local project in data folder
+writeRaster(abandoned_ssp1_2050, "data/outputs/SSP1_abandoned_cropland_global.tif")
+writeRaster(abandoned_ssp2_2050, "data/outputs/SSP2_abandoned_cropland_global.tif")
+writeRaster(abandoned_ssp3_2050, "data/outputs/SSP3_abandoned_cropland_global.tif")
+writeRaster(abandoned_ssp4_2050, "data/outputs/SSP4_abandoned_cropland_global.tif")
+writeRaster(abandoned_ssp5_2050, "data/outputs/SSP5_abandoned_cropland_global.tif")
+```
