@@ -33,57 +33,57 @@ First read in projected LULC from Chen et al. for every five years between 2020-
 
 ```{r}
 # read in "baseline" 2015 LULC
-PFT_2015_global <- rast("data/global_PFT_2015.tif")
+PFT_2015_global <- rast("data/src/global_PFT_2015.tif")
 
 
 # read in projected SSP1 LULC for 2020 - 2050 -------------------------------------------
-ssp1_2020_global <- rast("data/SSP1_RCP26/global_PFT_SSP1_RCP26_2020.tif")   #2020
-ssp1_2025_global <- rast("data/SSP1_RCP26/global_PFT_SSP1_RCP26_2025.tif")   #2025
-ssp1_2030_global <- rast("data/SSP1_RCP26/global_PFT_SSP1_RCP26_2030.tif")   #2030
-ssp1_2035_global <- rast("data/SSP1_RCP26/global_PFT_SSP1_RCP26_2035.tif")   #2035
-ssp1_2040_global <- rast("data/SSP1_RCP26/global_PFT_SSP1_RCP26_2040.tif")   #2040
-ssp1_2045_global <- rast("data/SSP1_RCP26/global_PFT_SSP1_RCP26_2045.tif")   #2045
-ssp1_2050_global <- rast("data/SSP1_RCP26/global_PFT_SSP1_RCP26_2050.tif")   #2050
+ssp1_2020_global <- rast("data/src/SSP1_RCP26/global_PFT_SSP1_RCP26_2020.tif")   #2020
+ssp1_2025_global <- rast("data/src/SSP1_RCP26/global_PFT_SSP1_RCP26_2025.tif")   #2025
+ssp1_2030_global <- rast("data/src/SSP1_RCP26/global_PFT_SSP1_RCP26_2030.tif")   #2030
+ssp1_2035_global <- rast("data/src/SSP1_RCP26/global_PFT_SSP1_RCP26_2035.tif")   #2035
+ssp1_2040_global <- rast("data/src/SSP1_RCP26/global_PFT_SSP1_RCP26_2040.tif")   #2040
+ssp1_2045_global <- rast("data/src/SSP1_RCP26/global_PFT_SSP1_RCP26_2045.tif")   #2045
+ssp1_2050_global <- rast("data/src/SSP1_RCP26/global_PFT_SSP1_RCP26_2050.tif")   #2050
 
 
 # read in projected SSP2 LULC for 2020 - 2050 -------------------------------------------
-ssp2_2020_global <- rast("data/SSP2_RCP45/global_PFT_SSP2_RCP45_2020.tif") 
-ssp2_2025_global <- rast("data/SSP2_RCP45/global_PFT_SSP2_RCP45_2025.tif")
-ssp2_2030_global <- rast("data/SSP2_RCP45/global_PFT_SSP2_RCP45_2030.tif") 
-ssp2_2035_global <- rast("data/SSP2_RCP45/global_PFT_SSP2_RCP45_2035.tif")
-ssp2_2040_global <- rast("data/SSP2_RCP45/global_PFT_SSP2_RCP45_2040.tif")
-ssp2_2045_global <- rast("data/SSP2_RCP45/global_PFT_SSP2_RCP45_2045.tif")
-ssp2_2050_global <- rast("data/SSP2_RCP45/global_PFT_SSP2_RCP45_2050.tif")
+ssp2_2020_global <- rast("data/src/SSP2_RCP45/global_PFT_SSP2_RCP45_2020.tif") 
+ssp2_2025_global <- rast("data/src/SSP2_RCP45/global_PFT_SSP2_RCP45_2025.tif")
+ssp2_2030_global <- rast("data/src/SSP2_RCP45/global_PFT_SSP2_RCP45_2030.tif") 
+ssp2_2035_global <- rast("data/src/SSP2_RCP45/global_PFT_SSP2_RCP45_2035.tif")
+ssp2_2040_global <- rast("data/src/SSP2_RCP45/global_PFT_SSP2_RCP45_2040.tif")
+ssp2_2045_global <- rast("data/src/SSP2_RCP45/global_PFT_SSP2_RCP45_2045.tif")
+ssp2_2050_global <- rast("data/src/SSP2_RCP45/global_PFT_SSP2_RCP45_2050.tif")
 
 
 # read in projected SSP3 LULC for 2020 - 2050 -------------------------------------------
-ssp3_2020_global <- rast("data/SSP3_RCP70/global_PFT_SSP3_RCP70_2020.tif")  
-ssp3_2025_global <- rast("data/SSP3_RCP70/global_PFT_SSP3_RCP70_2025.tif")  
-ssp3_2030_global <- rast("data/SSP3_RCP70/global_PFT_SSP3_RCP70_2030.tif")  
-ssp3_2035_global <- rast("data/SSP3_RCP70/global_PFT_SSP3_RCP70_2035.tif")  
-ssp3_2040_global <- rast("data/SSP3_RCP70/global_PFT_SSP3_RCP70_2040.tif")  
-ssp3_2045_global <- rast("data/SSP3_RCP70/global_PFT_SSP3_RCP70_2045.tif")  
-ssp3_2050_global <- rast("data/SSP3_RCP70/global_PFT_SSP3_RCP70_2050.tif")  
+ssp3_2020_global <- rast("data/src/SSP3_RCP70/global_PFT_SSP3_RCP70_2020.tif")  
+ssp3_2025_global <- rast("data/src/SSP3_RCP70/global_PFT_SSP3_RCP70_2025.tif")  
+ssp3_2030_global <- rast("data/src/SSP3_RCP70/global_PFT_SSP3_RCP70_2030.tif")  
+ssp3_2035_global <- rast("data/src/SSP3_RCP70/global_PFT_SSP3_RCP70_2035.tif")  
+ssp3_2040_global <- rast("data/src/SSP3_RCP70/global_PFT_SSP3_RCP70_2040.tif")  
+ssp3_2045_global <- rast("data/src/SSP3_RCP70/global_PFT_SSP3_RCP70_2045.tif")  
+ssp3_2050_global <- rast("data/src/SSP3_RCP70/global_PFT_SSP3_RCP70_2050.tif")  
 
 
 # read in projected SSP4 LULC for 2020 - 2050 -------------------------------------------
-ssp4_2020_global <- rast("data/SSP4_RCP60/global_PFT_SSP4_RCP60_2020.tif") 
-ssp4_2025_global <- rast("data/SSP4_RCP60/global_PFT_SSP4_RCP60_2025.tif") 
-ssp4_2030_global <- rast("data/SSP4_RCP60/global_PFT_SSP4_RCP60_2030.tif") 
-ssp4_2035_global <- rast("data/SSP4_RCP60/global_PFT_SSP4_RCP60_2035.tif") 
-ssp4_2040_global <- rast("data/SSP4_RCP60/global_PFT_SSP4_RCP60_2040.tif") 
-ssp4_2045_global <- rast("data/SSP4_RCP60/global_PFT_SSP4_RCP60_2045.tif")
-ssp4_2050_global <- rast("data/SSP4_RCP60/global_PFT_SSP4_RCP60_2050.tif") 
+ssp4_2020_global <- rast("data/src/SSP4_RCP60/global_PFT_SSP4_RCP60_2020.tif") 
+ssp4_2025_global <- rast("data/src/SSP4_RCP60/global_PFT_SSP4_RCP60_2025.tif") 
+ssp4_2030_global <- rast("data/src/SSP4_RCP60/global_PFT_SSP4_RCP60_2030.tif") 
+ssp4_2035_global <- rast("data/src/SSP4_RCP60/global_PFT_SSP4_RCP60_2035.tif") 
+ssp4_2040_global <- rast("data/src/SSP4_RCP60/global_PFT_SSP4_RCP60_2040.tif") 
+ssp4_2045_global <- rast("data/src/SSP4_RCP60/global_PFT_SSP4_RCP60_2045.tif")
+ssp4_2050_global <- rast("data/src/SSP4_RCP60/global_PFT_SSP4_RCP60_2050.tif") 
 
 
 # read in projected SSP5 LULC for 2020 - 2050 -------------------------------------------
-ssp5_2020_global <- rast("data/SSP5_RCP85/global_PFT_SSP5_RCP85_2020.tif") 
-ssp5_2025_global <- rast("data/SSP5_RCP85/global_PFT_SSP5_RCP85_2025.tif")
-ssp5_2030_global <- rast("data/SSP5_RCP85/global_PFT_SSP5_RCP85_2030.tif")
-ssp5_2035_global <- rast("data/SSP5_RCP85/global_PFT_SSP5_RCP85_2035.tif")
-ssp5_2040_global <- rast("data/SSP5_RCP85/global_PFT_SSP5_RCP85_2040.tif")
-ssp5_2045_global <- rast("data/SSP5_RCP85/global_PFT_SSP5_RCP85_2045.tif")
-ssp5_2050_global <- rast("data/SSP5_RCP85/global_PFT_SSP5_RCP85_2050.tif")
+ssp5_2020_global <- rast("data/src/SSP5_RCP85/global_PFT_SSP5_RCP85_2020.tif") 
+ssp5_2025_global <- rast("data/src/SSP5_RCP85/global_PFT_SSP5_RCP85_2025.tif")
+ssp5_2030_global <- rast("data/src/SSP5_RCP85/global_PFT_SSP5_RCP85_2030.tif")
+ssp5_2035_global <- rast("data/src/SSP5_RCP85/global_PFT_SSP5_RCP85_2035.tif")
+ssp5_2040_global <- rast("data/src/SSP5_RCP85/global_PFT_SSP5_RCP85_2040.tif")
+ssp5_2045_global <- rast("data/src/SSP5_RCP85/global_PFT_SSP5_RCP85_2045.tif")
+ssp5_2050_global <- rast("data/src/SSP5_RCP85/global_PFT_SSP5_RCP85_2050.tif")
 ```
 
 
@@ -312,6 +312,7 @@ ssp5_2050_brazil <- ssp5_2050_global %>%
 
 First, reclassify each LULC layer to isolate pixels of cropland (value 18) from the raster. 
 - Note: this method for reclassifying does not use the `terra::classify()` function. The same step could be done with `classify()`, but would require creating a matrix reassigning each of the 20 values for the raster. Because we're only interested in keeping one value from the raster, this was a quick work-around. 
+- NOTE: this method for reclassifying and calculating abandonment was actually longer than necessary! See workflow in "abandoned-cropland-global" markdown to see how the process could be expedited by reclassifying and subtracting rasters just one time. This analysis has already been run and the layers exported, so there was no immediate need to re-write the inefficient code.
 
 ```{r}
 # baseline 2015 data
@@ -829,10 +830,10 @@ abandoned_ssp5 <- classify(abandoned_ssp5, reclass_mat)
 Now we want to save these layers for future use in other scripts.
 ```{r}
 # saves raster to local project in data folder
-writeRaster(abandoned_ssp1, "data/SSP1_abandoned_cropland.tif")
-writeRaster(abandoned_ssp2, "data/SSP2_abandoned_cropland.tif")
-writeRaster(abandoned_ssp3, "data/SSP3_abandoned_cropland.tif")
-writeRaster(abandoned_ssp4, "data/SSP4_abandoned_cropland.tif")
-writeRaster(abandoned_ssp5, "data/SSP5_abandoned_cropland.tif")
+writeRaster(abandoned_ssp1, "data/outputs/SSP1_abandoned_cropland_brazil.tif")
+writeRaster(abandoned_ssp2, "data/outputs/SSP2_abandoned_cropland_brazil.tif")
+writeRaster(abandoned_ssp3, "data/outputs/SSP3_abandoned_cropland_brazil.tif")
+writeRaster(abandoned_ssp4, "data/outputs/SSP4_abandoned_cropland_brazil.tif")
+writeRaster(abandoned_ssp5, "data/outputs/SSP5_abandoned_cropland_brazil.tif")
 ```
 
