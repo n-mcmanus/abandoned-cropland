@@ -1,0 +1,19 @@
+---
+title: "Abandoned cropland global"
+author: "Nick McManus"
+date: '2022-10-10'
+output: html_document
+---
+
+```{r setup, include=TRUE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(sf)  #polygons
+library(raster) #raster package
+library(terra)  #newer/faster/better raster package
+library(rnaturalearth)  #administrative boundaries data
+library(tidyverse) #always
+```
+
+## R Markdown
+
+
