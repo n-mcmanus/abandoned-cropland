@@ -120,9 +120,9 @@ abandoned_ssp5_2050 <- diff_ssp5_2050
 Finally, we can save these layers for future use in other scripts.
 ```{r}
 # saves raster to local project in data folder
-writeRaster(abandoned_ssp1_2050, "data/outputs/SSP1_abandoned_cropland_global.tif")
-writeRaster(abandoned_ssp2_2050, "data/outputs/SSP2_abandoned_cropland_global.tif")
-writeRaster(abandoned_ssp3_2050, "data/outputs/SSP3_abandoned_cropland_global.tif")
-writeRaster(abandoned_ssp4_2050, "data/outputs/SSP4_abandoned_cropland_global.tif")
-writeRaster(abandoned_ssp5_2050, "data/outputs/SSP5_abandoned_cropland_global.tif")
+writeRaster(abandoned_ssp1_2050, "data/outputs/SSP1_abandoned_cropland_2050_global.tif")
+writeRaster(abandoned_ssp2_2050, "data/outputs/SSP2_abandoned_cropland_2050_global.tif")
+writeRaster(abandoned_ssp3_2050, "data/outputs/SSP3_abandoned_cropland_2050_global.tif")
+writeRaster(abandoned_ssp4_2050, "data/outputs/SSP4_abandoned_cropland_2050_global.tif")
+writeRaster(abandoned_ssp5_2050, "data/outputs/SSP5_abandoned_cropland_2050_global.tif")
 ```
