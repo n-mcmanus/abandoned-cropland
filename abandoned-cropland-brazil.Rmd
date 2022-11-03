@@ -801,12 +801,12 @@ reclass_mat <- matrix(reclass_df, ncol=2, byrow=TRUE)
 # add SSP1 layers and reclassify
 abandoned_ssp1 <- (ab_ssp1_2020u + ab_ssp1_2025u + ab_ssp1_2030u + ab_ssp1_2035u + 
                     ab_ssp1_2040u + ab_ssp1_2045u + ab_ssp1_2050u)
-abandoned_ssp1 <- classify(abandoned_ssp1, reclass_mat)
+abandoned_ssp1 <- classify(abandoned_ssp1, reclass_mat) %>% 
+  project("epsg:4326")
 
 # add SSP2 layers and reclassify
 abandoned_ssp2 <- (ab_ssp2_2020u + ab_ssp2_2025u + ab_ssp2_2030u + ab_ssp2_2035u + 
                     ab_ssp2_2040u + ab_ssp2_2045u + ab_ssp2_2050u)
-abandoned_ssp2 <- classify(abandoned_ssp2, reclass_mat)
 
 # add SSP3 layers and reclassify
 abandoned_ssp3 <- (ab_ssp3_2020u + ab_ssp3_2025u + ab_ssp3_2030u + 
@@ -824,6 +824,14 @@ abandoned_ssp5 <- (ab_ssp5_2020u + ab_ssp5_2025u + ab_ssp5_2030u +
 abandoned_ssp5 <- classify(abandoned_ssp5, reclass_mat)
 ```
 
+```{r}
+# put layers back in correct crs
+abandoned_ssp1 <- project(abandoned_ssp1, "epsg:4326") 
+abandoned_ssp2 <- project(abandoned_ssp2, "epsg:4326")
+abandoned_ssp3 <- project(abandoned_ssp3, "epsg:4326")
+abandoned_ssp4 <- project(abandoned_ssp4, "epsg:4326")
+abandoned_ssp5 <- project(abandoned_ssp5, "epsg:4326")
+```
 
 ## Export layers
 
