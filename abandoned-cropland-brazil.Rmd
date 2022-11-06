@@ -17,88 +17,82 @@ knitr::opts_chunk$set(echo = TRUE)
 library(sf)  #polygons
 library(raster) #raster package
 library(terra)  #newer/faster/better raster package
-library(rnaturalearth)  #administrative boundaries data
+library(rnaturalearth)  #administrative boundaries data (DELTE)
+library(geobr)  #administrative boundaries for Brazil
 library(tidyverse) #always
 ```
 
 ## Overview
-This analysis serves to find areas of projected cropland abandonment in Brazil between the years 2020 to 2050. Land use and land cover (LULC) data from Chen et al. 2022. This source includes both projected LULC under different shared socioeconomic pathways (SSPs) as well as a baseline LULC data from 2015. The outputs from this code, rasters containing every pixel of projected abandonment between 2020-2050 for a given SSP, will be utilized for further analysis into conservation optimization. More information on the source data can be found in the project README.md file. 
+This analysis serves to find areas of projected cropland abandonment in Brazil between the years 2020 to 2050. Land use and land cover (LULC) data sourced from Chen et al. 2022. This dataset includes projected LULC under different shared socioeconomic pathways (SSPs) as well as a baseline LULC data from 2015. The outputs from this code — rasters containing every pixel of projected abandonment between 2020-2050 for a given SSP — will be utilized for further analysis into conservation optimization. More information on the source data can be found in the project README.md file. 
 
 Source: Chen, G., Li, X., & Liu, X. (2022). Global land projection based on plant functional types with a 1-km resolution under socio-climatic scenarios. Scientific Data, 9(1), 125. https://doi.org/10.1038/s41597-022-01208-6
 
 
 ## Read in data
 
-First read in projected LULC from Chen et al. for every five years between 2020-2050. There are LULC layers for each of the five different SSPs.
+First read in projected LULC for every five years between 2020-2050. There are LULC layers for each of the five different SSPs.
 
 ```{r}
 # read in "baseline" 2015 LULC
-PFT_2015_global <- rast("data/src/global_PFT_2015.tif")
+PFT_2015_global <- rast("data/inputs/global_PFT_2015.tif")
 
 
 # read in projected SSP1 LULC for 2020 - 2050 -------------------------------------------
-ssp1_2020_global <- rast("data/src/SSP1_RCP26/global_PFT_SSP1_RCP26_2020.tif")   #2020
-ssp1_2025_global <- rast("data/src/SSP1_RCP26/global_PFT_SSP1_RCP26_2025.tif")   #2025
-ssp1_2030_global <- rast("data/src/SSP1_RCP26/global_PFT_SSP1_RCP26_2030.tif")   #2030
-ssp1_2035_global <- rast("data/src/SSP1_RCP26/global_PFT_SSP1_RCP26_2035.tif")   #2035
-ssp1_2040_global <- rast("data/src/SSP1_RCP26/global_PFT_SSP1_RCP26_2040.tif")   #2040
-ssp1_2045_global <- rast("data/src/SSP1_RCP26/global_PFT_SSP1_RCP26_2045.tif")   #2045
-ssp1_2050_global <- rast("data/src/SSP1_RCP26/global_PFT_SSP1_RCP26_2050.tif")   #2050
+ssp1_2020_global <- rast("data/inputs/SSP1_RCP26/global_PFT_SSP1_RCP26_2020.tif")   #2020
+ssp1_2025_global <- rast("data/inputs/SSP1_RCP26/global_PFT_SSP1_RCP26_2025.tif")   #2025
+ssp1_2030_global <- rast("data/inputs/SSP1_RCP26/global_PFT_SSP1_RCP26_2030.tif")   #2030
+ssp1_2035_global <- rast("data/inputs/SSP1_RCP26/global_PFT_SSP1_RCP26_2035.tif")   #2035
+ssp1_2040_global <- rast("data/inputs/SSP1_RCP26/global_PFT_SSP1_RCP26_2040.tif")   #2040
+ssp1_2045_global <- rast("data/inputs/SSP1_RCP26/global_PFT_SSP1_RCP26_2045.tif")   #2045
+ssp1_2050_global <- rast("data/inputs/SSP1_RCP26/global_PFT_SSP1_RCP26_2050.tif")   #2050
 
 
 # read in projected SSP2 LULC for 2020 - 2050 -------------------------------------------
-ssp2_2020_global <- rast("data/src/SSP2_RCP45/global_PFT_SSP2_RCP45_2020.tif") 
-ssp2_2025_global <- rast("data/src/SSP2_RCP45/global_PFT_SSP2_RCP45_2025.tif")
-ssp2_2030_global <- rast("data/src/SSP2_RCP45/global_PFT_SSP2_RCP45_2030.tif") 
-ssp2_2035_global <- rast("data/src/SSP2_RCP45/global_PFT_SSP2_RCP45_2035.tif")
-ssp2_2040_global <- rast("data/src/SSP2_RCP45/global_PFT_SSP2_RCP45_2040.tif")
-ssp2_2045_global <- rast("data/src/SSP2_RCP45/global_PFT_SSP2_RCP45_2045.tif")
-ssp2_2050_global <- rast("data/src/SSP2_RCP45/global_PFT_SSP2_RCP45_2050.tif")
+ssp2_2020_global <- rast("data/inputs/SSP2_RCP45/global_PFT_SSP2_RCP45_2020.tif") 
+ssp2_2025_global <- rast("data/inputs/SSP2_RCP45/global_PFT_SSP2_RCP45_2025.tif")
+ssp2_2030_global <- rast("data/inputs/SSP2_RCP45/global_PFT_SSP2_RCP45_2030.tif") 
+ssp2_2035_global <- rast("data/inputs/SSP2_RCP45/global_PFT_SSP2_RCP45_2035.tif")
+ssp2_2040_global <- rast("data/inputs/SSP2_RCP45/global_PFT_SSP2_RCP45_2040.tif")
+ssp2_2045_global <- rast("data/inputs/SSP2_RCP45/global_PFT_SSP2_RCP45_2045.tif")
+ssp2_2050_global <- rast("data/inputs/SSP2_RCP45/global_PFT_SSP2_RCP45_2050.tif")
 
 
 # read in projected SSP3 LULC for 2020 - 2050 -------------------------------------------
-ssp3_2020_global <- rast("data/src/SSP3_RCP70/global_PFT_SSP3_RCP70_2020.tif")  
-ssp3_2025_global <- rast("data/src/SSP3_RCP70/global_PFT_SSP3_RCP70_2025.tif")  
-ssp3_2030_global <- rast("data/src/SSP3_RCP70/global_PFT_SSP3_RCP70_2030.tif")  
-ssp3_2035_global <- rast("data/src/SSP3_RCP70/global_PFT_SSP3_RCP70_2035.tif")  
-ssp3_2040_global <- rast("data/src/SSP3_RCP70/global_PFT_SSP3_RCP70_2040.tif")  
-ssp3_2045_global <- rast("data/src/SSP3_RCP70/global_PFT_SSP3_RCP70_2045.tif")  
-ssp3_2050_global <- rast("data/src/SSP3_RCP70/global_PFT_SSP3_RCP70_2050.tif")  
+ssp3_2020_global <- rast("data/inputs/SSP3_RCP70/global_PFT_SSP3_RCP70_2020.tif")  
+ssp3_2025_global <- rast("data/inputs/SSP3_RCP70/global_PFT_SSP3_RCP70_2025.tif")  
+ssp3_2030_global <- rast("data/inputs/SSP3_RCP70/global_PFT_SSP3_RCP70_2030.tif")  
+ssp3_2035_global <- rast("data/inputs/SSP3_RCP70/global_PFT_SSP3_RCP70_2035.tif")  
+ssp3_2040_global <- rast("data/inputs/SSP3_RCP70/global_PFT_SSP3_RCP70_2040.tif")  
+ssp3_2045_global <- rast("data/inputs/SSP3_RCP70/global_PFT_SSP3_RCP70_2045.tif")  
+ssp3_2050_global <- rast("data/inputs/SSP3_RCP70/global_PFT_SSP3_RCP70_2050.tif")  
 
 
 # read in projected SSP4 LULC for 2020 - 2050 -------------------------------------------
-ssp4_2020_global <- rast("data/src/SSP4_RCP60/global_PFT_SSP4_RCP60_2020.tif") 
-ssp4_2025_global <- rast("data/src/SSP4_RCP60/global_PFT_SSP4_RCP60_2025.tif") 
-ssp4_2030_global <- rast("data/src/SSP4_RCP60/global_PFT_SSP4_RCP60_2030.tif") 
-ssp4_2035_global <- rast("data/src/SSP4_RCP60/global_PFT_SSP4_RCP60_2035.tif") 
-ssp4_2040_global <- rast("data/src/SSP4_RCP60/global_PFT_SSP4_RCP60_2040.tif") 
-ssp4_2045_global <- rast("data/src/SSP4_RCP60/global_PFT_SSP4_RCP60_2045.tif")
-ssp4_2050_global <- rast("data/src/SSP4_RCP60/global_PFT_SSP4_RCP60_2050.tif") 
+ssp4_2020_global <- rast("data/inputs/SSP4_RCP60/global_PFT_SSP4_RCP60_2020.tif") 
+ssp4_2025_global <- rast("data/inputs/SSP4_RCP60/global_PFT_SSP4_RCP60_2025.tif") 
+ssp4_2030_global <- rast("data/inputs/SSP4_RCP60/global_PFT_SSP4_RCP60_2030.tif") 
+ssp4_2035_global <- rast("data/inputs/SSP4_RCP60/global_PFT_SSP4_RCP60_2035.tif") 
+ssp4_2040_global <- rast("data/inputs/SSP4_RCP60/global_PFT_SSP4_RCP60_2040.tif") 
+ssp4_2045_global <- rast("data/inputs/SSP4_RCP60/global_PFT_SSP4_RCP60_2045.tif")
+ssp4_2050_global <- rast("data/inputs/SSP4_RCP60/global_PFT_SSP4_RCP60_2050.tif") 
 
 
 # read in projected SSP5 LULC for 2020 - 2050 -------------------------------------------
-ssp5_2020_global <- rast("data/src/SSP5_RCP85/global_PFT_SSP5_RCP85_2020.tif") 
-ssp5_2025_global <- rast("data/src/SSP5_RCP85/global_PFT_SSP5_RCP85_2025.tif")
-ssp5_2030_global <- rast("data/src/SSP5_RCP85/global_PFT_SSP5_RCP85_2030.tif")
-ssp5_2035_global <- rast("data/src/SSP5_RCP85/global_PFT_SSP5_RCP85_2035.tif")
-ssp5_2040_global <- rast("data/src/SSP5_RCP85/global_PFT_SSP5_RCP85_2040.tif")
-ssp5_2045_global <- rast("data/src/SSP5_RCP85/global_PFT_SSP5_RCP85_2045.tif")
-ssp5_2050_global <- rast("data/src/SSP5_RCP85/global_PFT_SSP5_RCP85_2050.tif")
+ssp5_2020_global <- rast("data/inputs/SSP5_RCP85/global_PFT_SSP5_RCP85_2020.tif") 
+ssp5_2025_global <- rast("data/inputs/SSP5_RCP85/global_PFT_SSP5_RCP85_2025.tif")
+ssp5_2030_global <- rast("data/inputs/SSP5_RCP85/global_PFT_SSP5_RCP85_2030.tif")
+ssp5_2035_global <- rast("data/inputs/SSP5_RCP85/global_PFT_SSP5_RCP85_2035.tif")
+ssp5_2040_global <- rast("data/inputs/SSP5_RCP85/global_PFT_SSP5_RCP85_2040.tif")
+ssp5_2045_global <- rast("data/inputs/SSP5_RCP85/global_PFT_SSP5_RCP85_2045.tif")
+ssp5_2050_global <- rast("data/inputs/SSP5_RCP85/global_PFT_SSP5_RCP85_2050.tif")
 ```
 
 
 Brazil is the ROI for this analysis. Read in shape file for Brazil to later clip LULC layers. 
 ```{r}
-# get brazil from rnaturalearth data
-brazil <- ne_countries(
-  scale = "medium",
-  country = "Brazil",
-  returnclass = "sf") %>% 
-  dplyr::select(sovereignt)
-
-# plot to check
-ggplot() +
-  geom_sf(data = brazil)
+# get brazil outline from geobr data
+brazil <- read_country(year = 2020,         #most recent boundary data
+                       simplified = FALSE)  #more accurate for spatial analyses
 ```
 
 
@@ -112,675 +106,433 @@ brazil_trans <- brazil %>%
   vect() # make object a vector, b/c vects more agreeable to rasts
 ```
 
-Now crop and mask each LULC raster to our `brazil_trans` vector. Then, project raster back to our desired crs.
+Now crop and mask each LULC raster to our `brazil_trans` vector.
 - Note: the `terra::crop()` function that clips rasters is not to be confused with "crops" used in later variable names to indicate rasters reclassified to isolate cropland. 
 ```{r}
 # crop baseline 2015 data
 PFT_2015_brazil <- PFT_2015_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans)
+# after clipping/masking, remove global object from environment
+# to save on computing space
+rm(PFT_2015_global)
+
+#use this to transform back to original crs of brazil (EPSG4674)
+#need to decide which projection is best for this analysis!
+#terra::project(y = crs(brazil)) 
 
 
 # crop and mask all SSP1 layers --------------------------
 ssp1_2020_brazil <- ssp1_2020_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp1_2020_global)
 
 ssp1_2025_brazil <- ssp1_2025_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans)
+rm(ssp1_2025_global)
 
 ssp1_2030_brazil <- ssp1_2030_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp1_2030_global)
 
 ssp1_2035_brazil <- ssp1_2035_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp1_2035_global)
 
 ssp1_2040_brazil <- ssp1_2040_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp1_2040_global)
 
 ssp1_2045_brazil <- ssp1_2045_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans)
+rm(ssp1_2045_global)
 
 ssp1_2050_brazil <- ssp1_2050_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp1_2050_global)
 
 
 # crop and mask all SSP2 layers --------------------------
 ssp2_2020_brazil <- ssp2_2020_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp2_2020_global)
 
 ssp2_2025_brazil <- ssp2_2025_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans)
+rm(ssp2_2025_global)
 
 ssp2_2030_brazil <- ssp2_2030_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp2_2030_global)
 
 ssp2_2035_brazil <- ssp2_2035_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans)
+rm(ssp2_2035_global)
 
 ssp2_2040_brazil <- ssp2_2040_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans)
+rm(ssp2_2040_global)
 
 ssp2_2045_brazil <- ssp2_2045_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp2_2045_global)
 
 ssp2_2050_brazil <- ssp2_2050_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp2_2050_global)
 
 
 # crop and mask all SSP3 layers --------------------------
 ssp3_2020_brazil <- ssp3_2020_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans)
+rm(ssp3_2020_global)
 
 ssp3_2025_brazil <- ssp3_2025_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans)
+rm(ssp3_2025_global)
 
 ssp3_2030_brazil <- ssp3_2030_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp3_2030_global)
 
 ssp3_2035_brazil <- ssp3_2035_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp3_2035_global)
 
 ssp3_2040_brazil <- ssp3_2040_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp3_2040_global)
 
 ssp3_2045_brazil <- ssp3_2045_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp3_2045_global)
 
 ssp3_2050_brazil <- ssp3_2050_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
-
+  mask(brazil_trans) 
+rm(ssp3_2050_global)
 
 # crop and mask all SSP4 layers ---------------------------
 ssp4_2020_brazil <- ssp4_2020_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp4_2020_global)
 
 ssp4_2025_brazil <- ssp4_2025_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp4_2025_global)
 
 ssp4_2030_brazil <- ssp4_2030_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp4_2030_global)
 
 ssp4_2035_brazil <- ssp4_2035_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp4_2035_global)
 
 ssp4_2040_brazil <- ssp4_2040_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp4_2040_global)
 
 ssp4_2045_brazil <- ssp4_2045_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp4_2045_global)
 
 ssp4_2050_brazil <- ssp4_2050_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans)
+rm(ssp4_2050_global)
 
 
 # crop and mask all SSP5 layers --------------------------
 ssp5_2020_brazil <- ssp5_2020_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp5_2020_global)
 
 ssp5_2025_brazil <- ssp5_2025_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp5_2025_global)
 
 ssp5_2030_brazil <- ssp5_2030_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans)
+rm(ssp5_2030_global)
 
 ssp5_2035_brazil <- ssp5_2035_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp5_2035_global)
 
 ssp5_2040_brazil <- ssp5_2040_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans)
+rm(ssp5_2040_global)
 
 ssp5_2045_brazil <- ssp5_2045_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans) 
+rm(ssp5_2045_global)
 
 ssp5_2050_brazil <- ssp5_2050_global %>% 
   crop(brazil_trans) %>% 
-  mask(brazil_trans) %>% 
-  terra::project(y = crs(brazil))
+  mask(brazil_trans)
+rm(ssp5_2050_global)
 ```
 
 
 ## Reclassify
 
-First, reclassify each LULC layer to isolate pixels of cropland (value 18) from the raster. 
-- Note: this method for reclassifying does not use the `terra::classify()` function. The same step could be done with `classify()`, but would require creating a matrix reassigning each of the 20 values for the raster. Because we're only interested in keeping one value from the raster, this was a quick work-around. 
-- NOTE: this method for reclassifying and calculating abandonment was actually longer than necessary! See workflow in "abandoned-cropland-global" markdown to see how the process could be expedited by reclassifying and subtracting rasters just one time. This analysis has already been run and the layers exported, so there was no immediate need to re-write the inefficient code.
+First, reclassify each LULC layer to isolate pixels of cropland (value 18) and urban (value 19) from the raster. Each layer will be reclassified to make all other variables 0.
 
 ```{r}
-# baseline 2015 data
-crops_2015_brazil <- PFT_2015_brazil 
-  crops_2015_brazil[crops_2015_brazil != 18] <- 0 # if value isn't 18, make 0
-  crops_2015_brazil[crops_2015_brazil == 18] <- 1 # if value is 18, make 1
-  
-  
-# SSP1 layers for 2020 - 2050 ---------------------------
-crops_ssp1_2020 <- ssp1_2020_brazil
-  crops_ssp1_2020[crops_ssp1_2020 != 18] <- 0
-  crops_ssp1_2020[crops_ssp1_2020 == 18] <- 1
+# create matrix for reclassification
+reclass_df <- c(1, 0,	  #Water
+                2, 0,	  #Broadleaf evergreen tree, tropical
+                3, 0,	  #Broadleaf evergreen tree, temperate
+                4, 0,	  #Broadleaf deciduous tree, tropical
+                5, 0,	  #Broadleaf deciduous tree, temperate
+                6, 0,	  #Broadleaf deciduous tree, boreal
+                7, 0,	  #Needleleaf evergreen tree, temperate
+                8, 0,	  #Needleleaf evergreen tree, boreal
+                9, 0,	  #Needleleaf deciduous tree
+                10, 0,	#Broadleaf evergreen shrub, temperate
+                11, 0,	#Broadleaf deciduous shrub, temperate
+                12, 0,	#Broadleaf deciduous shrub, boreal
+                13, 0,	#C3 grass, arctic
+                14, 0,	#C3 grass
+                15, 0,	#C4 grass
+                16, 0,	#Mixed C3/C4 grass
+                17, 0,	#Barren
+                18, 1,	#Cropland
+                19, 10,	#Urban
+                20, 0,  #Permanent snow and ice
+                128, 0)	#N/A values
 
-crops_ssp1_2025 <- ssp1_2025_brazil
-  crops_ssp1_2025[crops_ssp1_2025 != 18] <- 0
-  crops_ssp1_2025[crops_ssp1_2025 == 18] <- 1
-  
-crops_ssp1_2030 <- ssp1_2030_brazil   
-  crops_ssp1_2030[crops_ssp1_2030 != 18] <- 0
-  crops_ssp1_2030[crops_ssp1_2030 == 18] <- 1
-  
-crops_ssp1_2035 <- ssp1_2035_brazil
-  crops_ssp1_2035[crops_ssp1_2035 != 18] <- 0
-  crops_ssp1_2035[crops_ssp1_2035 == 18] <- 1  
-  
-crops_ssp1_2040 <- ssp1_2040_brazil
-  crops_ssp1_2040[crops_ssp1_2040 != 18] <- 0
-  crops_ssp1_2040[crops_ssp1_2040 == 18] <- 1
-  
-crops_ssp1_2045 <- ssp1_2045_brazil
-  crops_ssp1_2045[crops_ssp1_2045 != 18] <- 0
-  crops_ssp1_2045[crops_ssp1_2045 == 18] <- 1
-  
-crops_ssp1_2050 <- ssp1_2050_brazil
-  crops_ssp1_2050[crops_ssp1_2050 != 18] <- 0
-  crops_ssp1_2050[crops_ssp1_2050 == 18] <- 1
-  
+reclass_m <- matrix(reclass_df, ncol=2, byrow=TRUE)
 
-# SSP2 layers for 2020 - 2050 ---------------------------
-crops_ssp2_2020 <- ssp2_2020_brazil
-  crops_ssp2_2020[crops_ssp2_2020 != 18] <- 0
-  crops_ssp2_2020[crops_ssp2_2020 == 18] <- 1
+# baseline 2015 data -------------------------------------------
+crops_urban_2015_brazil <- classify(PFT_2015_brazil, reclass_m)
   
-crops_ssp2_2025 <- ssp2_2025_brazil
-  crops_ssp2_2025[crops_ssp2_2025 != 18] <- 0
-  crops_ssp2_2025[crops_ssp2_2025 == 18] <- 1
+  
+# SSP1 layers for 2020 - 2050 ----------------------------------
+ssp1_2020_crops_urban <- classify(ssp1_2020_brazil, reclass_m)
+ssp1_2025_crops_urban <- classify(ssp1_2025_brazil, reclass_m)
+ssp1_2030_crops_urban <- classify(ssp1_2030_brazil, reclass_m)
+ssp1_2035_crops_urban <- classify(ssp1_2035_brazil, reclass_m)
+ssp1_2040_crops_urban <- classify(ssp1_2040_brazil, reclass_m)
+ssp1_2045_crops_urban <- classify(ssp1_2045_brazil, reclass_m)
+ssp1_2050_crops_urban <- classify(ssp1_2050_brazil, reclass_m)
 
-crops_ssp2_2030 <- ssp2_2030_brazil   
-  crops_ssp2_2030[crops_ssp2_2030 != 18] <- 0
-  crops_ssp2_2030[crops_ssp2_2030 == 18] <- 1
-  
-crops_ssp2_2035 <- ssp2_2035_brazil
-  crops_ssp2_2035[crops_ssp2_2035 != 18] <- 0
-  crops_ssp2_2035[crops_ssp2_2035 == 18] <- 1
-  
-crops_ssp2_2040 <- ssp2_2040_brazil
-  crops_ssp2_2040[crops_ssp2_2040 != 18] <- 0
-  crops_ssp2_2040[crops_ssp2_2040 == 18] <- 1
-  
-crops_ssp2_2045 <- ssp2_2045_brazil
-  crops_ssp2_2045[crops_ssp2_2045 != 18] <- 0
-  crops_ssp2_2045[crops_ssp2_2045 == 18] <- 1
-  
-crops_ssp2_2050 <- ssp2_2050_brazil
-  crops_ssp2_2050[crops_ssp2_2050 != 18] <- 0
-  crops_ssp2_2050[crops_ssp2_2050 == 18] <- 1
+# remove old raster to save environment space (optional)
+rm(ssp1_2020_brazil)
+rm(ssp1_2025_brazil)
+rm(ssp1_2030_brazil)
+rm(ssp1_2035_brazil)
+rm(ssp1_2040_brazil)
+rm(ssp1_2045_brazil)
+rm(ssp1_2050_brazil)
 
-  
-# SSP3 layers for 2020 - 2050 ---------------------------
-crops_ssp3_2020 <- ssp3_2020_brazil
-  crops_ssp3_2020[crops_ssp3_2020 != 18] <- 0
-  crops_ssp3_2020[crops_ssp3_2020 == 18] <- 1
-  
-crops_ssp3_2025 <- ssp3_2025_brazil
-  crops_ssp3_2025[crops_ssp3_2025 != 18] <- 0
-  crops_ssp3_2025[crops_ssp3_2025 == 18] <- 1
+# SSP2 layers for 2020 - 2050 -----------------------------------
+ssp2_2020_crops_urban <- classify(ssp2_2020_brazil, reclass_m)
+ssp2_2025_crops_urban <- classify(ssp2_2025_brazil, reclass_m)
+ssp2_2030_crops_urban <- classify(ssp2_2030_brazil, reclass_m)
+ssp2_2035_crops_urban <- classify(ssp2_2035_brazil, reclass_m)
+ssp2_2040_crops_urban <- classify(ssp2_2040_brazil, reclass_m)
+ssp2_2045_crops_urban <- classify(ssp2_2045_brazil, reclass_m)
+ssp2_2050_crops_urban <- classify(ssp2_2050_brazil, reclass_m)
 
-crops_ssp3_2030 <- ssp3_2030_brazil   
-  crops_ssp3_2030[crops_ssp3_2030 != 18] <- 0
-  crops_ssp3_2030[crops_ssp3_2030 == 18] <- 1
-  
-crops_ssp3_2035 <- ssp3_2035_brazil
-  crops_ssp3_2035[crops_ssp3_2035 != 18] <- 0
-  crops_ssp3_2035[crops_ssp3_2035 == 18] <- 1
-  
-crops_ssp3_2040 <- ssp3_2040_brazil
-  crops_ssp3_2040[crops_ssp3_2040 != 18] <- 0
-  crops_ssp3_2040[crops_ssp3_2040 == 18] <- 1
-  
-crops_ssp3_2045 <- ssp3_2045_brazil
-  crops_ssp3_2045[crops_ssp3_2045 != 18] <- 0
-  crops_ssp3_2045[crops_ssp3_2045 == 18] <- 1
-  
-crops_ssp3_2050 <- ssp3_2050_brazil
-  crops_ssp3_2050[crops_ssp3_2050 != 18] <- 0
-  crops_ssp3_2050[crops_ssp3_2050 == 18] <- 1
-  
+rm(ssp2_2020_brazil)
+rm(ssp2_2025_brazil)
+rm(ssp2_2030_brazil)
+rm(ssp2_2035_brazil)
+rm(ssp2_2040_brazil)
+rm(ssp2_2045_brazil)
+rm(ssp2_2050_brazil)
 
-# SSP4 layers for 2020 - 2050 ---------------------------
-crops_ssp4_2020 <- ssp4_2020_brazil
-  crops_ssp4_2020[crops_ssp4_2020 != 18] <- 0
-  crops_ssp4_2020[crops_ssp4_2020 == 18] <- 1
+# SSP3 layers for 2020 - 2050 -----------------------------------
+ssp3_2020_crops_urban <- classify(ssp3_2020_brazil, reclass_m)
+ssp3_2025_crops_urban <- classify(ssp3_2025_brazil, reclass_m)
+ssp3_2030_crops_urban <- classify(ssp3_2030_brazil, reclass_m)
+ssp3_2035_crops_urban <- classify(ssp3_2035_brazil, reclass_m)
+ssp3_2040_crops_urban <- classify(ssp3_2040_brazil, reclass_m)
+ssp3_2045_crops_urban <- classify(ssp3_2045_brazil, reclass_m)
+ssp3_2050_crops_urban <- classify(ssp3_2050_brazil, reclass_m)
   
-crops_ssp4_2025 <- ssp4_2025_brazil
-  crops_ssp4_2025[crops_ssp4_2025 != 18] <- 0
-  crops_ssp4_2025[crops_ssp4_2025 == 18] <- 1
+rm(ssp3_2020_brazil)
+rm(ssp3_2025_brazil)
+rm(ssp3_2030_brazil)
+rm(ssp3_2035_brazil)
+rm(ssp3_2040_brazil)
+rm(ssp3_2045_brazil)
+rm(ssp3_2050_brazil)
 
-crops_ssp4_2030 <- ssp4_2030_brazil   
-  crops_ssp4_2030[crops_ssp4_2030 != 18] <- 0
-  crops_ssp4_2030[crops_ssp4_2030 == 18] <- 1
-  
-crops_ssp4_2035 <- ssp4_2035_brazil
-  crops_ssp4_2035[crops_ssp4_2035 != 18] <- 0
-  crops_ssp4_2035[crops_ssp4_2035 == 18] <- 1
-  
-crops_ssp4_2040 <- ssp4_2040_brazil
-  crops_ssp4_2040[crops_ssp4_2040 != 18] <- 0
-  crops_ssp4_2040[crops_ssp4_2040 == 18] <- 1
-  
-crops_ssp4_2045 <- ssp4_2045_brazil
-  crops_ssp4_2045[crops_ssp4_2045 != 18] <- 0
-  crops_ssp4_2045[crops_ssp4_2045 == 18] <- 1
-  
-crops_ssp4_2050 <- ssp4_2050_brazil
-  crops_ssp4_2050[crops_ssp4_2050 != 18] <- 0
-  crops_ssp4_2050[crops_ssp4_2050 == 18] <- 1
-  
-  
-# SSP5 layers for 2020 - 2050 ---------------------------
-crops_ssp5_2020 <- ssp5_2020_brazil
-  crops_ssp5_2020[crops_ssp5_2020 != 18] <- 0
-  crops_ssp5_2020[crops_ssp5_2020 == 18] <- 1
-  
-crops_ssp5_2025 <- ssp5_2025_brazil
-  crops_ssp5_2025[crops_ssp5_2025 != 18] <- 0
-  crops_ssp5_2025[crops_ssp5_2025 == 18] <- 1
+# SSP4 layers for 2020 - 2050 -----------------------------------
+ssp4_2020_crops_urban <- classify(ssp4_2020_brazil, reclass_m)
+ssp4_2025_crops_urban <- classify(ssp4_2025_brazil, reclass_m)
+ssp4_2030_crops_urban <- classify(ssp4_2030_brazil, reclass_m)
+ssp4_2035_crops_urban <- classify(ssp4_2035_brazil, reclass_m)
+ssp4_2040_crops_urban <- classify(ssp4_2040_brazil, reclass_m)
+ssp4_2045_crops_urban <- classify(ssp4_2045_brazil, reclass_m)
+ssp4_2050_crops_urban <- classify(ssp4_2050_brazil, reclass_m)
 
-crops_ssp5_2030 <- ssp5_2030_brazil   
-  crops_ssp5_2030[crops_ssp5_2030 != 18] <- 0
-  crops_ssp5_2030[crops_ssp5_2030 == 18] <- 1
+rm(ssp4_2020_brazil)
+rm(ssp4_2025_brazil)
+rm(ssp4_2030_brazil)
+rm(ssp4_2035_brazil)
+rm(ssp4_2040_brazil)
+rm(ssp4_2045_brazil)
+rm(ssp4_2050_brazil)
   
-crops_ssp5_2035 <- ssp5_2035_brazil
-  crops_ssp5_2035[crops_ssp5_2035 != 18] <- 0
-  crops_ssp5_2035[crops_ssp5_2035 == 18] <- 1
-  
-crops_ssp5_2040 <- ssp5_2040_brazil
-  crops_ssp5_2040[crops_ssp5_2040 != 18] <- 0
-  crops_ssp5_2040[crops_ssp5_2040 == 18] <- 1
-  
-crops_ssp5_2045 <- ssp5_2045_brazil
-  crops_ssp5_2045[crops_ssp5_2045 != 18] <- 0
-  crops_ssp5_2045[crops_ssp5_2045 == 18] <- 1
-  
-crops_ssp5_2050 <- ssp5_2050_brazil
-  crops_ssp5_2050[crops_ssp5_2050 != 18] <- 0
-  crops_ssp5_2050[crops_ssp5_2050 == 18] <- 1
+# SSP5 layers for 2020 - 2050 -----------------------------------
+ssp5_2020_crops_urban <- classify(ssp5_2020_brazil, reclass_m)
+ssp5_2025_crops_urban <- classify(ssp5_2025_brazil, reclass_m)
+ssp5_2030_crops_urban <- classify(ssp5_2030_brazil, reclass_m)
+ssp5_2035_crops_urban <- classify(ssp5_2035_brazil, reclass_m)
+ssp5_2040_crops_urban <- classify(ssp5_2040_brazil, reclass_m)
+ssp5_2045_crops_urban <- classify(ssp5_2045_brazil, reclass_m)
+ssp5_2050_crops_urban <- classify(ssp5_2050_brazil, reclass_m)
 
-```
-
-
-Next, reclassify layers each projected LULC layer to isolate urban pixels (value 19). Use for these will be explained in the following section.
-```{r}
-# SSP1 layers for 2020 - 2050 ------------------------
-urban_ssp1_2020 <- ssp1_2020_brazil
-  urban_ssp1_2020[urban_ssp1_2020 != 19] <- 0   # if value isn't 19, make 0
-  urban_ssp1_2020[urban_ssp1_2020 == 19] <- 10  # if value is 19, make 10
-
-urban_ssp1_2025 <- ssp1_2025_brazil
-  urban_ssp1_2025[urban_ssp1_2025 != 19] <- 0
-  urban_ssp1_2025[urban_ssp1_2025 == 19] <- 10
-  
-urban_ssp1_2030 <- ssp1_2030_brazil
-  urban_ssp1_2030[urban_ssp1_2030 != 19] <- 0
-  urban_ssp1_2030[urban_ssp1_2030 == 19] <- 10
-  
-urban_ssp1_2035 <- ssp1_2035_brazil
-  urban_ssp1_2035[urban_ssp1_2035 != 19] <- 0
-  urban_ssp1_2035[urban_ssp1_2035 == 19] <- 10
-  
-urban_ssp1_2040 <- ssp1_2040_brazil
-  urban_ssp1_2040[urban_ssp1_2040 != 19] <- 0
-  urban_ssp1_2040[urban_ssp1_2040 == 19] <- 10
-  
-urban_ssp1_2045 <- ssp1_2045_brazil
-  urban_ssp1_2045[urban_ssp1_2045 != 19] <- 0
-  urban_ssp1_2045[urban_ssp1_2045 == 19] <- 10
-  
-urban_ssp1_2050 <- ssp1_2050_brazil
-  urban_ssp1_2050[urban_ssp1_2050 != 19] <- 0
-  urban_ssp1_2050[urban_ssp1_2050 == 19] <- 10
-  
-
-# SSP2 layers for 2020 - 2050 ------------------------
-urban_ssp2_2020 <- ssp2_2020_brazil
-  urban_ssp2_2020[urban_ssp2_2020 != 19] <- 0  
-  urban_ssp2_2020[urban_ssp2_2020 == 19] <- 10
-  
-urban_ssp2_2025 <- ssp2_2025_brazil
-  urban_ssp2_2025[urban_ssp2_2025 != 19] <- 0  
-  urban_ssp2_2025[urban_ssp2_2025 == 19] <- 10
-
-urban_ssp2_2030 <- ssp2_2030_brazil   
-  urban_ssp2_2030[urban_ssp2_2030 != 19] <- 0
-  urban_ssp2_2030[urban_ssp2_2030 == 19] <- 10
-  
-urban_ssp2_2035 <- ssp2_2035_brazil
-  urban_ssp2_2035[urban_ssp2_2035 != 19] <- 0  
-  urban_ssp2_2035[urban_ssp2_2035 == 19] <- 10
-  
-urban_ssp2_2040 <- ssp2_2040_brazil
-  urban_ssp2_2040[urban_ssp2_2040 != 19] <- 0
-  urban_ssp2_2040[urban_ssp2_2040 == 19] <- 10
-  
-urban_ssp2_2045 <- ssp2_2045_brazil
-  urban_ssp2_2045[urban_ssp2_2045 != 19] <- 0  
-  urban_ssp2_2045[urban_ssp2_2045 == 19] <- 10
-  
-urban_ssp2_2050 <- ssp2_2050_brazil
-  urban_ssp2_2050[urban_ssp2_2050 != 19] <- 0
-  urban_ssp2_2050[urban_ssp2_2050 == 19] <- 10
-
-  
-# SSP3 layers for 2020 - 2050 ------------------------
-urban_ssp3_2020 <- ssp3_2020_brazil
-  urban_ssp3_2020[urban_ssp3_2020 != 19] <- 0  
-  urban_ssp3_2020[urban_ssp3_2020 == 19] <- 10
-  
-urban_ssp3_2025 <- ssp3_2025_brazil
-  urban_ssp3_2025[urban_ssp3_2025 != 19] <- 0  
-  urban_ssp3_2025[urban_ssp3_2025 == 19] <- 10
-
-urban_ssp3_2030 <- ssp3_2030_brazil   
-  urban_ssp3_2030[urban_ssp3_2030 != 19] <- 0
-  urban_ssp3_2030[urban_ssp3_2030 == 19] <- 10
-  
-urban_ssp3_2035 <- ssp3_2035_brazil
-  urban_ssp3_2035[urban_ssp3_2035 != 19] <- 0  
-  urban_ssp3_2035[urban_ssp3_2035 == 19] <- 10
-  
-urban_ssp3_2040 <- ssp3_2040_brazil
-  urban_ssp3_2040[urban_ssp3_2040 != 19] <- 0
-  urban_ssp3_2040[urban_ssp3_2040 == 19] <- 10
-  
-urban_ssp3_2045 <- ssp3_2045_brazil
-  urban_ssp3_2045[urban_ssp3_2045 != 19] <- 0  
-  urban_ssp3_2045[urban_ssp3_2045 == 19] <- 10
-  
-urban_ssp3_2050 <- ssp3_2050_brazil
-  urban_ssp3_2050[urban_ssp3_2050 != 19] <- 0
-  urban_ssp3_2050[urban_ssp3_2050 == 19] <- 10
-  
-
-# SSP4 layers for 2020 - 2050 ------------------------
-urban_ssp4_2020 <- ssp4_2020_brazil
-  urban_ssp4_2020[urban_ssp4_2020 != 19] <- 0  
-  urban_ssp4_2020[urban_ssp4_2020 == 19] <- 10
-  
-urban_ssp4_2025 <- ssp4_2025_brazil
-  urban_ssp4_2025[urban_ssp4_2025 != 19] <- 0  
-  urban_ssp4_2025[urban_ssp4_2025 == 19] <- 10
-
-urban_ssp4_2030 <- ssp4_2030_brazil   
-  urban_ssp4_2030[urban_ssp4_2030 != 19] <- 0
-  urban_ssp4_2030[urban_ssp4_2030 == 19] <- 10
-  
-urban_ssp4_2035 <- ssp4_2035_brazil
-  urban_ssp4_2035[urban_ssp4_2035 != 19] <- 0  
-  urban_ssp4_2035[urban_ssp4_2035 == 19] <- 10
-  
-urban_ssp4_2040 <- ssp4_2040_brazil
-  urban_ssp4_2040[urban_ssp4_2040 != 19] <- 0
-  urban_ssp4_2040[urban_ssp4_2040 == 19] <- 10
-  
-urban_ssp4_2045 <- ssp4_2045_brazil
-  urban_ssp4_2045[urban_ssp4_2045 != 19] <- 0  
-  urban_ssp4_2045[urban_ssp4_2045 == 19] <- 10
-  
-urban_ssp4_2050 <- ssp4_2050_brazil
-  urban_ssp4_2050[urban_ssp4_2050 != 19] <- 0
-  urban_ssp4_2050[urban_ssp4_2050 == 19] <- 10
-  
-  
-# SSP5 layers for 2020 - 2050 ------------------------
-urban_ssp5_2020 <- ssp5_2020_brazil
-  urban_ssp5_2020[urban_ssp5_2020 != 19] <- 0  
-  urban_ssp5_2020[urban_ssp5_2020 == 19] <- 10
-  
-urban_ssp5_2025 <- ssp5_2025_brazil
-  urban_ssp5_2025[urban_ssp5_2025 != 19] <- 0  
-  urban_ssp5_2025[urban_ssp5_2025 == 19] <- 10
-
-urban_ssp5_2030 <- ssp5_2030_brazil   
-  urban_ssp5_2030[urban_ssp5_2030 != 19] <- 0
-  urban_ssp5_2030[urban_ssp5_2030 == 19] <- 10
-  
-urban_ssp5_2035 <- ssp5_2035_brazil
-  urban_ssp5_2035[urban_ssp5_2035 != 19] <- 0  
-  urban_ssp5_2035[urban_ssp5_2035 == 19] <- 10
-  
-urban_ssp5_2040 <- ssp5_2040_brazil
-  urban_ssp5_2040[urban_ssp5_2040 != 19] <- 0
-  urban_ssp5_2040[urban_ssp5_2040 == 19] <- 10
-  
-urban_ssp5_2045 <- ssp5_2045_brazil
-  urban_ssp5_2045[urban_ssp5_2045 != 19] <- 0  
-  urban_ssp5_2045[urban_ssp5_2045 == 19] <- 10
-  
-urban_ssp5_2050 <- ssp5_2050_brazil
-  urban_ssp5_2050[urban_ssp5_2050 != 19] <- 0
-  urban_ssp5_2050[urban_ssp5_2050 == 19] <- 10
+rm(ssp5_2020_brazil)
+rm(ssp5_2025_brazil)
+rm(ssp5_2030_brazil)
+rm(ssp5_2035_brazil)
+rm(ssp5_2040_brazil)
+rm(ssp5_2045_brazil)
+rm(ssp5_2050_brazil)
 ```
 
 
 ## Calculate abandonment
 
-Now that we've isolated Brazilian cropland, we want to determine where current cropland is projected to become "abandoned" in the future. This will be done with a simple raster calculation, subtracting the future cropland raster from the current cropland raster. Values of 0 indicate land that either remained cropland (1-1) or remained non-cropland (0-0). Values of -1 indicate new future cropland (0-1), while values of 1 indicate abandoned cropland (1-0), our pixels of interest! 
+Now that we've isolated Brazilian cropland, we want to determine where current cropland is projected to become "abandoned" in the future. This will be done with a simple raster calculation, subtracting the future cropland raster from the current cropland raster. After the subtraction, values of 0 indicate land that either remained cropland (1-1), remained urban (10-10), or remained non-cropland (0-0). Values of -1 indicate new future cropland (0-1), values of -10 indicate areas of new urban (0-10), and values of -9 represent cropland that became urbanized (1-10). Values of *1* indicate abandoned cropland (1-0) that did not become urban, which are our pixels of interest!
 
 This calculation will be repeated for each projected raster (2020-2050) against the baseline raster (2015). 
 
 ```{r}
-# SSP1 abandonment 2020-2050 ----------------------------
-ab_ssp1_2020 <- crops_2015_brazil - crops_ssp1_2020
-ab_ssp1_2025 <- crops_2015_brazil - crops_ssp1_2025
-ab_ssp1_2030 <- crops_2015_brazil - crops_ssp1_2030
-ab_ssp1_2035 <- crops_2015_brazil - crops_ssp1_2035
-ab_ssp1_2040 <- crops_2015_brazil - crops_ssp1_2040
-ab_ssp1_2045 <- crops_2015_brazil - crops_ssp1_2045
-ab_ssp1_2050 <- crops_2015_brazil - crops_ssp1_2050
+# SSP1 abandonment 2020-2050 -----------------------------------------
+ssp1_2020_abandon <- crops_urban_2015_brazil - ssp1_2020_crops_urban
+ssp1_2025_abandon <- crops_urban_2015_brazil - ssp1_2025_crops_urban
+ssp1_2030_abandon <- crops_urban_2015_brazil - ssp1_2030_crops_urban
+ssp1_2035_abandon <- crops_urban_2015_brazil - ssp1_2035_crops_urban
+ssp1_2040_abandon <- crops_urban_2015_brazil - ssp1_2040_crops_urban
+ssp1_2045_abandon <- crops_urban_2015_brazil - ssp1_2045_crops_urban
+ssp1_2050_abandon <- crops_urban_2015_brazil - ssp1_2050_crops_urban
+
+# SSP2 abandonment 2020-2050 -----------------------------------------
+ssp2_2020_abandon <- crops_urban_2015_brazil - ssp2_2020_crops_urban
+ssp2_2025_abandon <- crops_urban_2015_brazil - ssp2_2025_crops_urban
+ssp2_2030_abandon <- crops_urban_2015_brazil - ssp2_2030_crops_urban
+ssp2_2035_abandon <- crops_urban_2015_brazil - ssp2_2035_crops_urban
+ssp2_2040_abandon <- crops_urban_2015_brazil - ssp2_2040_crops_urban
+ssp2_2045_abandon <- crops_urban_2015_brazil - ssp2_2045_crops_urban
+ssp2_2050_abandon <- crops_urban_2015_brazil - ssp2_2050_crops_urban
 
 
-# SSP2 abandonment 2020-2050 ----------------------------
-ab_ssp2_2020 <- crops_2015_brazil - crops_ssp2_2020
-ab_ssp2_2025 <- crops_2015_brazil - crops_ssp2_2025
-ab_ssp2_2030 <- crops_2015_brazil - crops_ssp2_2030
-ab_ssp2_2035 <- crops_2015_brazil - crops_ssp2_2035
-ab_ssp2_2040 <- crops_2015_brazil - crops_ssp2_2040
-ab_ssp2_2045 <- crops_2015_brazil - crops_ssp2_2045
-ab_ssp2_2050 <- crops_2015_brazil - crops_ssp2_2050
+# SSP3 abandonment 2020-2050 -----------------------------------------
+ssp3_2020_abandon <- crops_urban_2015_brazil - ssp3_2020_crops_urban
+ssp3_2025_abandon <- crops_urban_2015_brazil - ssp3_2025_crops_urban
+ssp3_2030_abandon <- crops_urban_2015_brazil - ssp3_2030_crops_urban
+ssp3_2035_abandon <- crops_urban_2015_brazil - ssp3_2035_crops_urban
+ssp3_2040_abandon <- crops_urban_2015_brazil - ssp3_2040_crops_urban
+ssp3_2045_abandon <- crops_urban_2015_brazil - ssp3_2045_crops_urban
+ssp3_2050_abandon <- crops_urban_2015_brazil - ssp3_2050_crops_urban
 
 
-# SSP3 abandonment 2020-2050 ----------------------------
-ab_ssp3_2020 <- crops_2015_brazil - crops_ssp3_2020
-ab_ssp3_2025 <- crops_2015_brazil - crops_ssp3_2025
-ab_ssp3_2030 <- crops_2015_brazil - crops_ssp3_2030
-ab_ssp3_2035 <- crops_2015_brazil - crops_ssp3_2035
-ab_ssp3_2040 <- crops_2015_brazil - crops_ssp3_2040
-ab_ssp3_2045 <- crops_2015_brazil - crops_ssp3_2045
-ab_ssp3_2050 <- crops_2015_brazil - crops_ssp3_2050
+# SSP4 abandonment 2020-2050 -----------------------------------------
+ssp4_2020_abandon <- crops_urban_2015_brazil - ssp4_2020_crops_urban
+ssp4_2025_abandon <- crops_urban_2015_brazil - ssp4_2025_crops_urban
+ssp4_2030_abandon <- crops_urban_2015_brazil - ssp4_2030_crops_urban
+ssp4_2035_abandon <- crops_urban_2015_brazil - ssp4_2035_crops_urban
+ssp4_2040_abandon <- crops_urban_2015_brazil - ssp4_2040_crops_urban
+ssp4_2045_abandon <- crops_urban_2015_brazil - ssp4_2045_crops_urban
+ssp4_2050_abandon <- crops_urban_2015_brazil - ssp4_2050_crops_urban
 
 
-# SSP4 abandonment 2020-2050 ----------------------------
-ab_ssp4_2020 <- crops_2015_brazil - crops_ssp4_2020
-ab_ssp4_2025 <- crops_2015_brazil - crops_ssp4_2025
-ab_ssp4_2030 <- crops_2015_brazil - crops_ssp4_2030
-ab_ssp4_2035 <- crops_2015_brazil - crops_ssp4_2035
-ab_ssp4_2040 <- crops_2015_brazil - crops_ssp4_2040
-ab_ssp4_2045 <- crops_2015_brazil - crops_ssp4_2045
-ab_ssp4_2050 <- crops_2015_brazil - crops_ssp4_2050
-
-
-# SSP5 abandonment 2020-2050 ----------------------------
-ab_ssp5_2020 <- crops_2015_brazil - crops_ssp5_2020
-ab_ssp5_2025 <- crops_2015_brazil - crops_ssp5_2025
-ab_ssp5_2030 <- crops_2015_brazil - crops_ssp5_2030
-ab_ssp5_2035 <- crops_2015_brazil - crops_ssp5_2035
-ab_ssp5_2040 <- crops_2015_brazil - crops_ssp5_2040
-ab_ssp5_2045 <- crops_2015_brazil - crops_ssp5_2045
-ab_ssp5_2050 <- crops_2015_brazil - crops_ssp5_2050
+# SSP5 abandonment 2020-2050 -----------------------------------------
+ssp5_2020_abandon <- crops_urban_2015_brazil - ssp5_2020_crops_urban
+ssp5_2025_abandon <- crops_urban_2015_brazil - ssp5_2025_crops_urban
+ssp5_2030_abandon <- crops_urban_2015_brazil - ssp5_2030_crops_urban
+ssp5_2035_abandon <- crops_urban_2015_brazil - ssp5_2035_crops_urban
+ssp5_2040_abandon <- crops_urban_2015_brazil - ssp5_2040_crops_urban
+ssp5_2045_abandon <- crops_urban_2015_brazil - ssp5_2045_crops_urban
+ssp5_2050_abandon <- crops_urban_2015_brazil - ssp5_2050_crops_urban
 
 ```
 
-
-Now, remove any pixels that change from cropland to urban in the future. Urbanization of cropland disqualifies it from potential restoration and is not useful for this project's analysis. This is done by subtracting projected urban areas (classified as value of 10) from the abandonment layers (classified value of 1). 
-Values of 1 indicate cropland abandonment without transition to urban (1-0). Values of -9 indicate areas of abandonment that did transition to urban (1-10). 
-```{r}
-# SSP1 non-urbanized abandonment 2020-2050 --------------------
-ab_ssp1_2020u <- ab_ssp1_2020 - urban_ssp1_2020
-ab_ssp1_2025u <- ab_ssp1_2025 - urban_ssp1_2025
-ab_ssp1_2030u <- ab_ssp1_2030 - urban_ssp1_2030
-ab_ssp1_2035u <- ab_ssp1_2035 - urban_ssp1_2035
-ab_ssp1_2040u <- ab_ssp1_2040 - urban_ssp1_2040
-ab_ssp1_2045u <- ab_ssp1_2045 - urban_ssp1_2045
-ab_ssp1_2050u <- ab_ssp1_2050 - urban_ssp1_2050
-
-# SSP2 non-urbanized abandonment 2020-2050 --------------------
-ab_ssp2_2020u <- ab_ssp2_2020 - urban_ssp2_2020
-ab_ssp2_2025u <- ab_ssp2_2025 - urban_ssp2_2025
-ab_ssp2_2030u <- ab_ssp2_2030 - urban_ssp2_2030
-ab_ssp2_2035u <- ab_ssp2_2035 - urban_ssp2_2035
-ab_ssp2_2040u <- ab_ssp2_2040 - urban_ssp2_2040
-ab_ssp2_2045u <- ab_ssp2_2045 - urban_ssp2_2045
-ab_ssp2_2050u <- ab_ssp2_2050 - urban_ssp2_2050
-
-# SSP3 non-urbanized abandonment 2020-2050 --------------------
-ab_ssp3_2020u <- ab_ssp3_2020 - urban_ssp3_2020
-ab_ssp3_2025u <- ab_ssp3_2025 - urban_ssp3_2025
-ab_ssp3_2030u <- ab_ssp3_2030 - urban_ssp3_2030
-ab_ssp3_2035u <- ab_ssp3_2035 - urban_ssp3_2035
-ab_ssp3_2040u <- ab_ssp3_2040 - urban_ssp3_2040
-ab_ssp3_2045u <- ab_ssp3_2045 - urban_ssp3_2045
-ab_ssp3_2050u <- ab_ssp3_2050 - urban_ssp3_2050
-
-# SSP4 non-urbanized abandonment 2020-2050 --------------------
-ab_ssp4_2020u <- ab_ssp4_2020 - urban_ssp4_2020
-ab_ssp4_2025u <- ab_ssp4_2025 - urban_ssp4_2025
-ab_ssp4_2030u <- ab_ssp4_2030 - urban_ssp4_2030
-ab_ssp4_2035u <- ab_ssp4_2035 - urban_ssp4_2035
-ab_ssp4_2040u <- ab_ssp4_2040 - urban_ssp4_2040
-ab_ssp4_2045u <- ab_ssp4_2045 - urban_ssp4_2045
-ab_ssp4_2050u <- ab_ssp4_2050 - urban_ssp4_2050
-
-# SSP5 non-urbanized abandonment 2020-2050 --------------------
-ab_ssp5_2020u <- ab_ssp5_2020 - urban_ssp5_2020
-ab_ssp5_2025u <- ab_ssp5_2025 - urban_ssp5_2025
-ab_ssp5_2030u <- ab_ssp5_2030 - urban_ssp5_2030
-ab_ssp5_2035u <- ab_ssp5_2035 - urban_ssp5_2035
-ab_ssp5_2040u <- ab_ssp5_2040 - urban_ssp5_2040
-ab_ssp5_2045u <- ab_ssp5_2045 - urban_ssp5_2045
-ab_ssp5_2050u <- ab_ssp5_2050 - urban_ssp5_2050
-```
-
-These layers may be useful for future study into the rates of LULC transition over time between cropland and urban classification. For this analysis, we want to isolate just pixels of non-urbanized cropland abandonment (value 1). In this next step, we'll reclassify the abandonment layers to only return pixels of non-urbanized abandonment (for ease of next analysis steps).
+These layers may be useful for future study into the rates of LULC transition over time between cropland and urban classification. For this analysis, we want to isolate just pixels of non-urbanized cropland abandonment (*value 1*). In this next step, we'll reclassify the abandonment layers to only return pixels of non-urbanized abandonment.
 
 ```{r}
 # reclassify SSP1 non-urbanized cropland abandonment 2020-2050 
-ab_ssp1_2020u[ab_ssp1_2020u != 1] <- 0  # only keeping values of 1
-ab_ssp1_2025u[ab_ssp1_2025u != 1] <- 0
-ab_ssp1_2030u[ab_ssp1_2030u != 1] <- 0
-ab_ssp1_2035u[ab_ssp1_2035u != 1] <- 0
-ab_ssp1_2040u[ab_ssp1_2040u != 1] <- 0
-ab_ssp1_2045u[ab_ssp1_2045u != 1] <- 0
-ab_ssp1_2050u[ab_ssp1_2050u != 1] <- 0
+ssp1_2020_abandon[ssp1_2020_abandon != 1] <- 0  # only keeping values of 1
+ssp1_2025_abandon[ssp1_2025_abandon != 1] <- 0
+ssp1_2030_abandon[ssp1_2030_abandon != 1] <- 0
+ssp1_2035_abandon[ssp1_2035_abandon != 1] <- 0
+ssp1_2040_abandon[ssp1_2040_abandon != 1] <- 0
+ssp1_2045_abandon[ssp1_2045_abandon != 1] <- 0
+ssp1_2050_abandon[ssp1_2050_abandon != 1] <- 0
 
 # reclassify SSP2 non-urbanized cropland abandonment 2020-2050 
-ab_ssp2_2020u[ab_ssp2_2020u != 1] <- 0
-ab_ssp2_2025u[ab_ssp2_2025u != 1] <- 0
-ab_ssp2_2030u[ab_ssp2_2030u != 1] <- 0
-ab_ssp2_2035u[ab_ssp2_2035u != 1] <- 0
-ab_ssp2_2040u[ab_ssp2_2040u != 1] <- 0
-ab_ssp2_2045u[ab_ssp2_2045u != 1] <- 0
-ab_ssp2_2050u[ab_ssp2_2050u != 1] <- 0
+ssp2_2020_abandon[ssp2_2020_abandon != 1] <- 0  
+ssp2_2025_abandon[ssp2_2025_abandon != 1] <- 0
+ssp2_2030_abandon[ssp2_2030_abandon != 1] <- 0
+ssp2_2035_abandon[ssp2_2035_abandon != 1] <- 0
+ssp2_2040_abandon[ssp2_2040_abandon != 1] <- 0
+ssp2_2045_abandon[ssp2_2045_abandon != 1] <- 0
+ssp2_2050_abandon[ssp2_2050_abandon != 1] <- 0
 
 # reclassify SSP3 non-urbanized cropland abandonment 2020-2050 
-ab_ssp3_2020u[ab_ssp3_2020u != 1] <- 0
-ab_ssp3_2025u[ab_ssp3_2025u != 1] <- 0
-ab_ssp3_2030u[ab_ssp3_2030u != 1] <- 0
-ab_ssp3_2035u[ab_ssp3_2035u != 1] <- 0
-ab_ssp3_2040u[ab_ssp3_2040u != 1] <- 0
-ab_ssp3_2045u[ab_ssp3_2045u != 1] <- 0
-ab_ssp3_2050u[ab_ssp3_2050u != 1] <- 0
+ssp3_2020_abandon[ssp3_2020_abandon != 1] <- 0 
+ssp3_2025_abandon[ssp3_2025_abandon != 1] <- 0
+ssp3_2030_abandon[ssp3_2030_abandon != 1] <- 0
+ssp3_2035_abandon[ssp3_2035_abandon != 1] <- 0
+ssp3_2040_abandon[ssp3_2040_abandon != 1] <- 0
+ssp3_2045_abandon[ssp3_2045_abandon != 1] <- 0
+ssp3_2050_abandon[ssp3_2050_abandon != 1] <- 0
 
 # reclassify SSP4 non-urbanized cropland abandonment 2020-2050 
-ab_ssp4_2020u[ab_ssp4_2020u != 1] <- 0
-ab_ssp4_2025u[ab_ssp4_2025u != 1] <- 0
-ab_ssp4_2030u[ab_ssp4_2030u != 1] <- 0
-ab_ssp4_2035u[ab_ssp4_2035u != 1] <- 0
-ab_ssp4_2040u[ab_ssp4_2040u != 1] <- 0
-ab_ssp4_2045u[ab_ssp4_2045u != 1] <- 0
-ab_ssp4_2050u[ab_ssp4_2050u != 1] <- 0
+ssp4_2020_abandon[ssp4_2020_abandon != 1] <- 0  
+ssp4_2025_abandon[ssp4_2025_abandon != 1] <- 0
+ssp4_2030_abandon[ssp4_2030_abandon != 1] <- 0
+ssp4_2035_abandon[ssp4_2035_abandon != 1] <- 0
+ssp4_2040_abandon[ssp4_2040_abandon != 1] <- 0
+ssp4_2045_abandon[ssp4_2045_abandon != 1] <- 0
+ssp4_2050_abandon[ssp4_2050_abandon != 1] <- 0
 
 # reclassify SSP5 non-urbanized cropland abandonment 2020-2050 
-ab_ssp5_2020u[ab_ssp5_2020u != 1] <- 0
-ab_ssp5_2025u[ab_ssp5_2025u != 1] <- 0
-ab_ssp5_2030u[ab_ssp5_2030u != 1] <- 0
-ab_ssp5_2035u[ab_ssp5_2035u != 1] <- 0
-ab_ssp5_2040u[ab_ssp5_2040u != 1] <- 0
-ab_ssp5_2045u[ab_ssp5_2045u != 1] <- 0
-ab_ssp5_2050u[ab_ssp5_2050u != 1] <- 0
+ssp5_2020_abandon[ssp5_2020_abandon != 1] <- 0  
+ssp5_2025_abandon[ssp5_2025_abandon != 1] <- 0
+ssp5_2030_abandon[ssp5_2030_abandon != 1] <- 0
+ssp5_2035_abandon[ssp5_2035_abandon != 1] <- 0
+ssp5_2040_abandon[ssp5_2040_abandon != 1] <- 0
+ssp5_2045_abandon[ssp5_2045_abandon != 1] <- 0
+ssp5_2050_abandon[ssp5_2050_abandon != 1] <- 0
 ```
 
 Then, values for an SSP will be summed to return one spatial raster indicating every pixel of cropland was projected to be abandoned *at some point* between 2020-2050. The number of years each pixel is abandoned may be useful for future analysis and addressing other research questions. For the sake of this analysis, we will reclassify summed values to all be 1. 
