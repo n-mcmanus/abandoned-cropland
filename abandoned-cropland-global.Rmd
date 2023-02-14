@@ -7,11 +7,9 @@ output: html_document
 
 ```{r setup, include=TRUE, message = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(sf)  #polygons
-library(raster) #raster package
-library(terra)  #newer/faster/better raster package
-library(rnaturalearth)  #administrative boundaries data
+library(terra)     #geospatial analysis (better)
 library(tidyverse) #always
+library(kableExtra) #tables
 ```
 
 ## Overview
@@ -26,18 +24,18 @@ First read in projected 2050 LULC from Chen et al. for each SSP.
 
 ```{r}
 # read in "baseline" 2015 LULC
-PFT_2015 <- rast("data/src/global_PFT_2015.tif")
+PFT_2015 <- rast("data/inputs/global_PFT_2015.tif")
 
 # SSP1
-ssp1_PFT_2050 <- rast("data/src/SSP1_RCP26/global_PFT_SSP1_RCP26_2050.tif")
+ssp1_PFT_2050 <- rast("data/inputs/SSP1_RCP26/global_PFT_SSP1_RCP26_2050.tif")
 # SSP2
-ssp2_PFT_2050 <- rast("data/src/SSP2_RCP45/global_PFT_SSP2_RCP45_2050.tif")
+ssp2_PFT_2050 <- rast("data/inputs/SSP2_RCP45/global_PFT_SSP2_RCP45_2050.tif")
 # SSP3  
-ssp3_PFT_2050 <- rast("data/src/SSP3_RCP70/global_PFT_SSP3_RCP70_2050.tif")  
+ssp3_PFT_2050 <- rast("data/inputs/SSP3_RCP70/global_PFT_SSP3_RCP70_2050.tif")  
 # SSP4
-ssp4_PFT_2050 <- rast("data/src/SSP4_RCP60/global_PFT_SSP4_RCP60_2050.tif") 
+ssp4_PFT_2050 <- rast("data/inputs/SSP4_RCP60/global_PFT_SSP4_RCP60_2050.tif") 
 # SSP5
-ssp5_PFT_2050 <- rast("data/src/SSP5_RCP85/global_PFT_SSP5_RCP85_2050.tif")
+ssp5_PFT_2050 <- rast("data/inputs/SSP5_RCP85/global_PFT_SSP5_RCP85_2050.tif")
 ```
 
 
@@ -113,6 +111,70 @@ abandoned_ssp4_2050 <- diff_ssp4_2050
 abandoned_ssp5_2050 <- diff_ssp5_2050
   abandoned_ssp5_2050[abandoned_ssp5_2050 != 1] <- 0
 ```
+
+
+## Find net abandonment
+
+To find the net amount of cropland under each SSP, we'll reclassify the layers to only keep new and abandoned cropland. For calculating net abandonment, urbanized cropland (value -9) *will* count toward total abandonment. 
+```{r}
+# reclassification matrix
+new_ab_crop_m <- matrix(c(-9,1, -10,0), ncol = 2, byrow = TRUE)
+
+# reclassify
+ssp1_2050 <- classify(diff_ssp1_2050, new_ab_crop_m)
+ssp2_2050 <- classify(diff_ssp2_2050, new_ab_crop_m)
+ssp3_2050 <- classify(diff_ssp3_2050, new_ab_crop_m)
+ssp4_2050 <- classify(diff_ssp4_2050, new_ab_crop_m)
+ssp5_2050 <- classify(diff_ssp5_2050, new_ab_crop_m)
+
+# find stats on abandonment, emergent cropland, and net abandonment
+
+## assign amount of abandoned parcels (value 1) to object
+ssp1_ab <- freq(ssp1_2050)[3,3]
+ssp2_ab <- freq(ssp2_2050)[3,3]
+ssp3_ab <- freq(ssp3_2050)[3,3]
+ssp4_ab <- freq(ssp4_2050)[3,3]
+ssp5_ab <- freq(ssp5_2050)[3,3]
+
+## assign amount of new cropland (value -1) to object
+ssp1_new <- freq(ssp1_2050)[1,3]
+ssp2_new <- freq(ssp2_2050)[1,3]
+ssp3_new <- freq(ssp3_2050)[1,3]
+ssp4_new <- freq(ssp4_2050)[1,3]
+ssp5_new <- freq(ssp5_2050)[1,3]
+
+## net abandonment
+ssp1_net <- global(ssp1_2050, fun = 'sum')
+ssp2_net <- global(ssp2_2050, fun = 'sum')
+ssp3_net <- global(ssp3_2050, fun = 'sum')
+ssp4_net <- global(ssp4_2050, fun = 'sum')
+ssp5_net <- global(ssp5_2050, fun = 'sum')
+
+## put it in a nice little table
+net_df <- matrix(c('ssp1', ssp1_ab, ssp1_new, ssp1_net,
+                   'ssp2', ssp2_ab, ssp2_new, ssp2_net,
+                   'ssp3', ssp3_ab, ssp3_new, ssp3_net,
+                   'ssp4', ssp4_ab, ssp4_new, ssp4_net,
+                   'ssp5', ssp5_ab, ssp5_new, ssp5_net), ncol = 4, byrow = T)
+colnames(net_df) <- c('SSP', 'Total abandonment (km^2)', 'New cropland (km^2)', 'Net abandonment (km^2)')
+
+net_table <- net_df %>% 
+  kable() %>% 
+  kable_styling(full_width = FALSE) %>% 
+  kable_material_dark('striped')
+net_table
+
+## export table
+write.csv(net_df, "data/outputs/net_abandonment.csv")
+
+## export rasters
+writeRaster(ssp1_2050, "data/outputs/SSP1_new_ab_crops_2050.tif")
+writeRaster(ssp2_2050, "data/outputs/SSP2_new_ab_crops_2050.tif")
+writeRaster(ssp3_2050, "data/outputs/SSP3_new_ab_crops_2050.tif")
+writeRaster(ssp4_2050, "data/outputs/SSP4_new_ab_crops_2050.tif")
+writeRaster(ssp5_2050, "data/outputs/SSP5_new_ab_crops_2050.tif")
+```
+
 
 
 ## Export layers
